@@ -1,15 +1,52 @@
-import { mockProperties } from "../../../mock/data";
+"use client";
 
-export default function Property({ params }) {
-    const { reference } = params;
-    const property = mockProperties.find((p) => p.reference === reference);
 
-    if (!property) {
+import { fetchPropertyByReference } from "../../../api/propertyApi";
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation"; 
+
+export default function Property() {
+    const params = useParams();
+    const { reference } = params; 
+    const [property, setProperty] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        if (!reference) return; 
+
+        const getProperty = async () => {
+            try {
+                const fetchedProperty = await fetchPropertyByReference(reference);
+                setProperty(fetchedProperty);
+                setLoading(false);
+            } catch (error) {
+                console.error("Failed to fetch property:", error);
+                setError("The property you are looking for does not exist.");
+                setLoading(false);
+            }
+        };
+
+        getProperty();
+    }, [reference]);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <div className="bg-white p-8 rounded-xl shadow-lg text-center">
+                    <h2 className="text-2xl font-bold text-gray-800 mb-4">Loading Property...</h2>
+                    <p className="text-gray-600">Please wait while we load the property details.</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (error || !property) {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
                 <div className="bg-white p-8 rounded-xl shadow-lg text-center">
                     <h2 className="text-2xl font-bold text-gray-800 mb-4">Property Not Found</h2>
-                    <p className="text-gray-600">The property you are looking for does not exist.</p>
+                    <p className="text-gray-600">{error}</p>
                 </div>
             </div>
         );
@@ -29,7 +66,7 @@ export default function Property({ params }) {
                     </div>
                 </div>
 
-                {/* Property Details */}
+               
                 <div className="p-8">
                     <div className="flex justify-between items-center mb-6">
                         <h1 className="text-4xl font-extrabold text-gray-900">
@@ -44,7 +81,7 @@ export default function Property({ params }) {
                         </div>
                     </div>
 
-                    {/* Property Highlights */}
+                   
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                         <div className="bg-gray-100 p-4 rounded-lg flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-3 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -52,16 +89,16 @@ export default function Property({ params }) {
                             </svg>
                             <div>
                                 <p className="text-sm text-gray-600">Square Meters</p>
-                                <p className="font-bold">{property.square_meters} sqm</p>
+                                <p className="font-bold  text-black">{property.square_meters} sqm</p>
                             </div>
                         </div>
-                        <div className="bg-gray-100 p-4 rounded-lg flex items-center">
+                        <div className="bg-gray-200 p-4 rounded-lg flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-3 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16H4a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
                             </svg>
                             <div>
                                 <p className="text-sm text-gray-600">Bedrooms</p>
-                                <p className="font-bold">{property.bedrooms}</p>
+                                <p className="font-bold  text-black">{property.bedrooms}</p>
                             </div>
                         </div>
                         <div className="bg-gray-100 p-4 rounded-lg flex items-center">
@@ -70,7 +107,7 @@ export default function Property({ params }) {
                             </svg>
                             <div>
                                 <p className="text-sm text-gray-600">Bathrooms</p>
-                                <p className="font-bold">{property.bathrooms}</p>
+                                <p className="font-bold text-black">{property.bathrooms}</p>
                             </div>
                         </div>
                         <div className="bg-gray-100 p-4 rounded-lg flex items-center">
@@ -79,12 +116,12 @@ export default function Property({ params }) {
                             </svg>
                             <div>
                                 <p className="text-sm text-gray-600">Reference</p>
-                                <p className="font-bold">{property.reference}</p>
+                                <p className="font-bold text-black">{property.reference}</p>
                             </div>
                         </div>
                     </div>
 
-                    {/* Description */}
+                   
                     <div className="mb-8">
                         <h2 className="text-2xl font-bold text-gray-900 mb-4">Property Description</h2>
                         <p className="text-gray-700 leading-relaxed">
@@ -92,7 +129,6 @@ export default function Property({ params }) {
                         </p>
                     </div>
 
-                    {/* Additional Gallery (if multiple photos) */}
                     {property.photos.length > 1 && (
                         <div>
                             <h2 className="text-2xl font-bold text-gray-900 mb-4">Additional Photos</h2>
@@ -112,8 +148,4 @@ export default function Property({ params }) {
             </div>
         </div>
     );
-}
-
-export async function generateStaticParams() {
-    return mockProperties.map((property) => ({ reference: property.reference }));
 }

@@ -19,4 +19,25 @@ export const fetchProperties = async () => {
   }
 };
 
+
+export const fetchPropertyByReference = async (reference) => {
+  try {
+    const response = await api.get(`/api/properties/reference/${reference}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Failed to fetch property with reference ${reference}:`, error);
+    throw error;
+  }
+};
+
+export const fetchPropertyById = async (propertyId) => {
+  try {
+    const response = await api.get(`/api/properties/${propertyId}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Failed to fetch property with ID ${propertyId}:`, error);
+    throw error;
+  }
+};
+
 export default api;

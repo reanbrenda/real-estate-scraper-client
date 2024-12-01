@@ -116,9 +116,9 @@ export default function Home() {
                                     onChange={(e) => setCategory(e.target.value)}
                                     className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
                                 >
-                                    <option value="">All Categories</option>
-                                    <option value="plot of land">Plot of Land</option>
-                                    <option value="chalet / villa">Chalet / Villa</option>
+                                    <option className="text-black" value="">All Categories</option>
+                                    <option className="text-black" value="plot of land">Plot of Land</option>
+                                    <option className="text-black" value="chalet / villa">Chalet / Villa</option>
                                 </select>
                             </div>
 
