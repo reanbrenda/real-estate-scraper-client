@@ -205,7 +205,6 @@ export default function Home() {
                                    category={property.category || "Uncategorized"}
                                    bedrooms={property.bedrooms || 0}
                                    bathrooms={property.bathrooms || 0}
-                                   description={property.description || "No description available."}
                                    reference={property.reference || "No reference"}
                                />
                            ))}
