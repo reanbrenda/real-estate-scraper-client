@@ -199,8 +199,8 @@ export default function Home() {
                                    <Card
                                    key={property.id}
                                    photo={property.photos?.[0] || "https://via.placeholder.com/300"}
-                                   price={property.price !== null ? property.price : "N/A"}
-                                   squareMeter={property.square_meters || "N/A"}
+                                   price={property.price !== null ? property.price : "$"}
+                                   squareMeter={property.square_meters ||  "__"}
                                    region={property.region || "Unknown"}
                                    category={property.category || "Uncategorized"}
                                    bedrooms={property.bedrooms || 0}
