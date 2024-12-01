@@ -1,0 +1,86 @@
+export const mockProperties = [
+    
+        {
+            "reference": "lucie-hauri_idyllic-quiet-plot-with-building-permit-near-cas-concos",
+            "region": "Cas Concos",
+            "town": "Cas Concos",
+            "category": "Plot of land",
+            "price": 450000.0,
+            "square_meters": 0.0,
+            "bedrooms": null,
+            "bathrooms": null,
+            "description": "The property of over 20,000 m2 is situated in an idyllic location in the southeast of Mallorca with fabulous distant views all the way to Felanitx and Mount San Salvador. Not far from the original village of Cas Concos, which houses restaurants, bars, supermarkets, two small delightful town hotels and tourist accommodation, it is nestled in the landscape characterized by wild olive and carob trees, rounded by the sound of sheep bells.\nThe building permit according to the new building law for the construction of a finca of 235 mÂ² plus terraces and a pool of approx. 24 mÂ² (3.25 x 7.40 m) as well as a corresponding project planning is available. The power supply is to be provided by photovoltaic systems; the water supply by cisterns.",
+            "photos": [
+                "https://www.lucie-hauri.com/wp-content/uploads/2024/05/e0315c37d2e140f991787b84a0c93daf.jpg",
+                "https://www.lucie-hauri.com/wp-content/uploads/2024/05/660a5c7be40742a793ebd6be4593572e.jpg",
+                "https://www.lucie-hauri.com/wp-content/uploads/2024/05/dee668538cc7456d9fc1b969ac90a658.jpg",
+                "https://www.lucie-hauri.com/wp-content/uploads/2024/05/caa10812649e46fa803234ce74fe4cc6.jpg",
+                "https://www.lucie-hauri.com/wp-content/uploads/2024/05/7c7ea03df3534d7a873170594e225d06.jpg",
+                "https://www.lucie-hauri.com/wp-content/uploads/2024/05/98746b8210944bce84b76ba53b2f0f4b.jpg",
+                "https://www.lucie-hauri.com/wp-content/uploads/2024/05/074b54db3af14550af0e168373a031b5.jpg",
+                "https://www.lucie-hauri.com/wp-content/uploads/2024/05/7a97c0da9061408cbc585d9965c982f1.jpg",
+                "https://www.lucie-hauri.com/wp-content/uploads/2024/05/5ed5a5812e78417f91b5bf71ca4f8fc9.jpg",
+                "https://www.lucie-hauri.com/wp-content/uploads/2024/05/fe65c7e535b843deb6f2647238125ae4.jpg",
+                "https://www.lucie-hauri.com/wp-content/uploads/2024/05/3f1737a6ece54d359e789a8494a0f6cc.jpg",
+                "https://www.lucie-hauri.com/wp-content/uploads/2024/05/98a2f22eb97c4ef986b3974e537e597c.jpg",
+                "https://www.lucie-hauri.com/wp-content/uploads/2024/05/6ac60ee8c5c34df38f4b1619c987aeb5.jpg",
+                "https://www.lucie-hauri.com/wp-content/uploads/2024/05/28b21f4815d8444ea26e5e9773eb6f92.jpg",
+                "https://www.lucie-hauri.com/wp-content/uploads/2024/05/20667be886744717bbffe74679b45c03.jpg",
+                "https://www.lucie-hauri.com/wp-content/uploads/2024/05/f00a900dbddb41af818a6682aa8efa34.jpg",
+                "https://www.lucie-hauri.com/wp-content/uploads/2024/05/15a0e7fb4feb49e49ed12d7358aeca39.jpg",
+                "https://www.lucie-hauri.com/wp-content/uploads/2024/05/fe99cc81cde4424394d315e5eb38a6ee.jpg",
+                "https://www.lucie-hauri.com/wp-content/uploads/2024/05/d7b4ce27d0194fd9816e2ba67a97b0d2.jpg",
+                "https://www.lucie-hauri.com/wp-content/uploads/2024/05/06ee6a0bcf994399b1a1f027967027cd.jpg",
+                "https://www.lucie-hauri.com/wp-content/uploads/2024/05/a61225d9bfc74c9e854e609ac95bfb9f.jpg",
+                "https://www.lucie-hauri.com/wp-content/uploads/2024/05/1fe0aa644fa440d5a03ed37ad7c8906a.jpg"
+            ],
+            "id": 1,
+            "created_at": "2024-12-01T13:00:57.779643",
+            "updated_at": "2024-12-01T13:00:57.779643"
+        },
+        {
+            "reference": "lucie-hauri_detached-beach-house-within-walking-distance-of-the-beach-in-cala-llombards",
+            "region": "Cala Llombards",
+            "town": "Cala Llombards",
+            "category": "Chalet / Villa",
+            "price": 1985000.0,
+            "square_meters": 0.0,
+            "bedrooms": 3,
+            "bathrooms": 3,
+            "description": "This high-quality modern property with its timeless design is being built in the tranquil coastal town of Cala Llombards. Traditional Mediterranean building elements have been reinterpreted and give the clear architecture a special degree of charm and well-being. State-of-the-art building technology works unobtrusively in the background. The combination of exclusive aesthetics and modern design succeeds quite effortlessly.\nYou enter this beach house, which is flooded with Mediterranean light, through a welcoming entrance area and directly into the spacious living and dining area, which is directly adjacent to the open designer kitchen equipped with high-quality brand-name appliances. On one side of the living area, you have a beautiful view of the glazed patio with its gargoyle, while on the other side, the large floor-to-ceiling windows offer a view of the garden and pool area. On the first floor there is also a bedroom with en-suite bathroom, a guest WC and a utility room.\nThe upper floor houses a master bedroom and a further bedroom, each with an en suite bathroom and a private, partially covered terrace. From here you can enjoy the magnificent sunsets that the southeast of Mallorca has to offer.\nIn the garden you will find a pleasantly large pool measuring 9 x 3.6 m with a spacious chill-out area that invites you to linger and relax.\nThe bathrooms are fitted with high-quality wood and natural stone and the bedrooms are fully air-conditioned. The technical equipment also includes underfloor heating, a heat pump and water heating, which is supported by a photovoltaic system. SAT-TV and internet connections are available.\nThe bay of Cala Llombards, with its crystal-clear, turquoise waters and fine sandy beach, is framed by high cliffs covered with pine trees. In summer there is also a cozy beach bar here.\nThe plots of approx. 600 mÂ² each offer plenty of privacy, as the houses are detached. This is the last property of the 1st construction phase and is located between the two houses that have already been sold. In this quiet cul-de-sac, only a few minutes’ walk from the beach, 3 more villas are planned in the 2nd construction phase.\nCala Llombards is a small, quiet coastal village in the immediate vicinity of the pretty market town of SantanyÃ­. This region in the southeast of Mallorca is still very unspoiled, there are no large hotels, but you will find an intact environment, small tranquil places and a wonderful nature with many beautiful, small bays.\nThe airport and the capital Palma are approx. 40 minutes away. The highway ends in Campos, from here it is approx. 15 minutes via a well-developed country road to Cala Llombards.",
+            "photos": [
+                "https://www.lucie-hauri.com/wp-content/uploads/2024/09/17ea98c6291e48d6a65647b6942ad336.jpg",
+                "https://www.lucie-hauri.com/wp-content/uploads/2024/09/02d222d6d2b54173bbd0c5af9cf5f40d.jpg",
+                "https://www.lucie-hauri.com/wp-content/uploads/2024/09/b17b6be93bf14436ada38bccc39e04fa.jpg",
+                "https://www.lucie-hauri.com/wp-content/uploads/2024/09/b9cf2f2a3f4e47549edf9f4e1369e48c.jpg",
+                "https://www.lucie-hauri.com/wp-content/uploads/2024/09/089e9de093984cd8bb7bf60e21c11f4d.jpg",
+                "https://www.lucie-hauri.com/wp-content/uploads/2024/09/77002ee491cf40b49591176bc9756478.jpg",
+                "https://www.lucie-hauri.com/wp-content/uploads/2024/09/0cead030162d42c79aeb74235d569527.jpg",
+                "https://www.lucie-hauri.com/wp-content/uploads/2024/09/05f6ddc86eaf4cd7b1ead57f17680564.jpg"
+            ],
+            "id": 2,
+            "created_at": "2024-12-01T13:08:57.158395",
+            "updated_at": "2024-12-01T13:08:57.158395"
+        },
+        {
+            "reference": "lucie-hauri_extensive-plot-near-santanyi-with-approved-project",
+            "region": "Santanyi",
+            "town": "Santanyi",
+            "category": "Plot of land",
+            "price": 750000.0,
+            "square_meters": 0.0,
+            "bedrooms": null,
+            "bathrooms": null,
+            "description": "Beautifully situated plot of approx. 49,000 mÂ², only a few minutes by car from SantanyÃ­. This plot is surrounded by green fields and offers a magnificent view over the fields to the church of SantanyÃ­.\nThe plans provide the construccion of a detached house of approx. 300 mÂ², 31 mÂ² covered terrace, 123 mÂ² cellar as well as a swimming-pool of 35 mÂ² is beeing planned here. It will be sold with electricity and water connections.\nDoes this plot sound interesting to you? Please do not hesitate to contact us by phone on +34 971 825 062 or by mail to info@lucie-hauri.com.",
+            "photos": [
+                "https://www.lucie-hauri.com/wp-content/uploads/2024/05/cd48329f04374595aaf9d3248a792547.jpg",
+                "https://www.lucie-hauri.com/wp-content/uploads/2024/05/434eefcf659741068b68b5d5353a77cf.jpg",
+                "https://www.lucie-hauri.com/wp-content/uploads/2024/05/60da55444a2a45df877a0a24ca9f0e7f.jpg",
+                "https://www.lucie-hauri.com/wp-content/uploads/2024/05/0a9869db943a48cd9e99cf7ac195ae91.jpg"
+            ],
+            "id": 3,
+            "created_at": "2024-12-01T13:08:58.662580",
+            "updated_at": "2024-12-01T13:08:58.662580"
+        },
+      
+];
