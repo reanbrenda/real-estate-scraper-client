@@ -1,7 +1,7 @@
 "use client";
 
 
-import { fetchPropertyByReference } from "../../propertyApi";
+import { fetchPropertyByReference } from "../../../api/properties";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation"; 
 

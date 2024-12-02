@@ -8,7 +8,7 @@ const Card = ({ photo, price, squareMeter, region, category, bedrooms, bathrooms
 
             
             <div className="p-4">
-                <h2 className="text-xl font-bold">{category}</h2>
+                <h2 className="text-xl font-bold text-blue-800">{category}</h2>
                 <p className="text-gray-600">{region}</p>
                 <p className="text-lg font-semibold text-gray-800">${price}</p>
                 <p className="text-gray-500">{squareMeter} sqm</p>

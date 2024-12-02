@@ -1,7 +1,7 @@
 export async function fetchProperties() {
     try {
       const res = await fetch('https://real-estate-scraper-api.onrender.com/properties', {
-        next: { revalidate: 3600 } // Revalidate every hour
+        next: { revalidate: 300 } 
       });
   
       if (!res.ok) {

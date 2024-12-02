@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { fetchProperties } from "./propertyApi";
+import { fetchProperties } from "../api/properties";
 import Card from "../components/Card";
 
 export default function Home() {
@@ -93,7 +93,7 @@ export default function Home() {
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
                                     placeholder="e.g., Cas Concos"
-                                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+                                    className="text-black w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
                                 />
                             </div>
 
