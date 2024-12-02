@@ -1,28 +1,25 @@
 import axios from "axios";
 
-
 const api = axios.create({
-  baseURL: "/", 
+  baseURL: "https://real-estate-scraper-api.onrender.com",
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-
 export const fetchProperties = async () => {
   try {
-    const response = await api.get("/api/properties");
-    return response.data; 
+    const response = await api.get("/properties");
+    return response.data;
   } catch (error) {
     console.error("Failed to fetch properties:", error);
-    throw error; 
+    throw error;
   }
 };
 
-
 export const fetchPropertyByReference = async (reference) => {
   try {
-    const response = await api.get(`/api/properties/reference/${reference}`);
+    const response = await api.get(`/properties/reference/${reference}`);
     return response.data;
   } catch (error) {
     console.error(`Failed to fetch property with reference ${reference}:`, error);
@@ -32,7 +29,7 @@ export const fetchPropertyByReference = async (reference) => {
 
 export const fetchPropertyById = async (propertyId) => {
   try {
-    const response = await api.get(`/api/properties/${propertyId}`);
+    const response = await api.get(`/properties/${propertyId}`);
     return response.data;
   } catch (error) {
     console.error(`Failed to fetch property with ID ${propertyId}:`, error);
