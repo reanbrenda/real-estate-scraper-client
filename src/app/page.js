@@ -1,31 +1,29 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { fetchProperties } from "../api/propertyApi"; 
+import { fetchProperties } from "./propertyApi";
 import Card from "../components/Card";
 
 export default function Home() {
-    const [properties, setProperties] = useState([]); 
+    const [properties, setProperties] = useState([]);
     const [filteredProperties, setFilteredProperties] = useState([]);
-    const [loading, setLoading] = useState(true); 
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-   
     const [search, setSearch] = useState("");
-    const [minPrice, setMinPrice] = useState(0);
-    const [maxPrice, setMaxPrice] = useState(1000000);
+    const [minPrice, setMinPrice] = useState("");
+    const [maxPrice, setMaxPrice] = useState("");
     const [category, setCategory] = useState("");
     const [minBedrooms, setMinBedrooms] = useState(0);
     const [minBathrooms, setMinBathrooms] = useState(0);
 
-    
     useEffect(() => {
         const loadProperties = async () => {
             try {
                 setLoading(true);
-                const data = await fetchProperties(); 
-                setProperties(data || []); 
-                setFilteredProperties(data || []); 
+                const data = await fetchProperties();
+                setProperties(data || []);
+                setFilteredProperties(data || []);
             } catch (err) {
                 setError("Failed to fetch properties. Please try again later.");
                 console.error(err);
@@ -37,7 +35,6 @@ export default function Home() {
         loadProperties();
     }, []);
 
-   
     const applyFilters = () => {
         const filtered = properties.filter((property) => {
             const price = property.price || 0;
@@ -49,8 +46,8 @@ export default function Home() {
 
             return (
                 (region.includes(search.toLowerCase()) || reference.includes(search.toLowerCase())) &&
-                price >= minPrice &&
-                price <= maxPrice &&
+                (minPrice === "" || price >= Number(minPrice)) &&
+                (maxPrice === "" || price <= Number(maxPrice)) &&
                 (category === "" || categoryValue === category) &&
                 bedrooms >= minBedrooms &&
                 bathrooms >= minBathrooms
@@ -58,7 +55,6 @@ export default function Home() {
         });
         setFilteredProperties(filtered);
     };
-
 
     if (loading) {
         return (
@@ -68,7 +64,6 @@ export default function Home() {
         );
     }
 
-   
     if (error) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -81,21 +76,17 @@ export default function Home() {
         <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-7xl mx-auto">
                 <div className="bg-white shadow-xl rounded-2xl overflow-hidden">
-                    
                     <div className="bg-gradient-to-r from-blue-600 to-blue-400 p-6">
                         <h1 className="text-4xl font-extrabold text-white text-center tracking-tight">
                             Real Estate Listings
                         </h1>
                     </div>
 
-                    
                     <div className="p-6 bg-gray-50">
                         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                           
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                                   
-                                Search Location
+                                    Search Location
                                 </label>
                                 <input
                                     type="text"
@@ -106,7 +97,6 @@ export default function Home() {
                                 />
                             </div>
 
-                           
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
                                     Property Type
@@ -114,26 +104,35 @@ export default function Home() {
                                 <select
                                     value={category}
                                     onChange={(e) => setCategory(e.target.value)}
-                                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+                                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 text-black"
                                 >
-                                    <option className="text-black" value="">All Categories</option>
-                                    <option className="text-black" value="plot of land">Plot of Land</option>
-                                    <option className="text-black" value="chalet / villa">Chalet / Villa</option>
+                                    <option value="" className="text-black bg-white">
+                                        All Categories
+                                    </option>
+                                    <option value="plot of land" className="text-black bg-white">
+                                        Plot of Land
+                                    </option>
+                                    <option value="chalet / villa" className="text-black bg-white">
+                                        Chalet / Villa
+                                    </option>
                                 </select>
                             </div>
 
-                            
                             <div className="flex space-x-2">
                                 <div className="w-1/2">
                                     <label className="block text-sm font-medium text-gray-700 mb-1">
                                         Min Price
                                     </label>
                                     <input
-                                        type="number"
+                                        type="text"
                                         value={minPrice}
-                                        onChange={(e) => setMinPrice(Number(e.target.value) || 0)}
+                                        onChange={(e) => {
+
+                                            const value = e.target.value.replace(/[^0-9]/g, '');
+                                            setMinPrice(value);
+                                        }}
                                         placeholder="Min"
-                                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+                                        className="text-black w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
                                     />
                                 </div>
                                 <div className="w-1/2">
@@ -141,16 +140,19 @@ export default function Home() {
                                         Max Price
                                     </label>
                                     <input
-                                        type="number"
+                                        type="text"
                                         value={maxPrice}
-                                        onChange={(e) => setMaxPrice(Number(e.target.value) || 1000000)}
+                                        onChange={(e) => {
+                                            // Allow only numbers and empty string
+                                            const value = e.target.value.replace(/[^0-9]/g, '');
+                                            setMaxPrice(value);
+                                        }}
                                         placeholder="Max"
-                                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+                                        className="text-black w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
                                     />
                                 </div>
                             </div>
 
-                          
                             <div className="flex space-x-2">
                                 <div className="w-1/2">
                                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -161,7 +163,7 @@ export default function Home() {
                                         value={minBedrooms}
                                         onChange={(e) => setMinBedrooms(Number(e.target.value))}
                                         placeholder="Min"
-                                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+                                        className="text-black w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
                                     />
                                 </div>
                                 <div className="w-1/2">
@@ -173,13 +175,12 @@ export default function Home() {
                                         value={minBathrooms}
                                         onChange={(e) => setMinBathrooms(Number(e.target.value))}
                                         placeholder="Min"
-                                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+                                        className="text-black w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
                                     />
                                 </div>
                             </div>
                         </div>
 
-                       
                         <div className="mt-6 flex justify-end">
                             <button
                                 onClick={applyFilters}
@@ -190,36 +191,33 @@ export default function Home() {
                         </div>
                     </div>
 
-                   
                     {filteredProperties.length > 0 ? (
                         <div className="p-6 bg-white">
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {filteredProperties.map((property) => (
-                                   
-                                   <Card
-                                   key={property.id}
-                                   photo={property.photos?.[0] || "https://via.placeholder.com/300"}
-                                   price={property.price !== null ? property.price : "$"}
-                                   squareMeter={property.square_meters ||  "__"}
-                                   region={property.region || "Unknown"}
-                                   category={property.category || "Uncategorized"}
-                                   bedrooms={property.bedrooms || 0}
-                                   bathrooms={property.bathrooms || 0}
-                                   reference={property.reference || "No reference"}
-                               />
-                           ))}
-                       </div>
-                   </div>
-               ) : (
-                   <div className="p-12 text-center bg-gray-50">
-                       <p className="text-xl text-gray-500">
-                           No properties found. Try adjusting your search filters.
-                       </p>
-                   </div>
-               )}
-           </div>
-       </div>
-   </div>
-);
+                                    <Card
+                                        key={property.id}
+                                        photo={property.photos?.[0] || "https://via.placeholder.com/300"}
+                                        price={property.price !== null ? property.price : "$"}
+                                        squareMeter={property.square_meters || "__"}
+                                        region={property.region || "Unknown"}
+                                        category={property.category || "Uncategorized"}
+                                        bedrooms={property.bedrooms || 0}
+                                        bathrooms={property.bathrooms || 0}
+                                        reference={property.reference || "No reference"}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="p-12 text-center bg-gray-50">
+                            <p className="text-xl text-gray-500">
+                                No properties found. Try adjusting your search filters.
+                            </p>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
 }
-
