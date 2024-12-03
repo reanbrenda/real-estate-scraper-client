@@ -102,20 +102,35 @@ export default function Home() {
                                     Property Type
                                 </label>
                                 <select
-                                    value={category}
-                                    onChange={(e) => setCategory(e.target.value)}
-                                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 text-black"
-                                >
-                                    <option value="" className="text-black bg-white">
-                                        All Categories
-                                    </option>
-                                    <option value="plot of land" className="text-black bg-white">
-                                        Plot of Land
-                                    </option>
-                                    <option value="chalet / villa" className="text-black bg-white">
-                                        Chalet / Villa
-                                    </option>
-                                </select>
+    value={category}
+    onChange={(e) => setCategory(e.target.value)}
+    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 text-black"
+>
+        <option value="" className="text-black bg-white">
+            All Categories
+        </option>
+        <option value="plot of land" className="text-black bg-white">
+            Plot of Land
+        </option>
+        <option value="chalet / villa" className="text-black bg-white">
+            Chalet / Villa
+        </option>
+        <option value="finca / country house" className="text-black bg-white">
+            Finca / Country House
+        </option>
+        <option value="apartment" className="text-black bg-white">
+            Apartment
+        </option>
+        <option value="town house / village house" className="text-black bg-white">
+            Town house / Village house
+        </option>
+        <option value="terraced house / semi-detached house" className="text-black bg-white">
+             Terraced house / Semi-detached house
+        </option>
+        
+
+    </select>
+
                             </div>
 
                             <div className="flex space-x-2">
