@@ -89,7 +89,7 @@ export default function Property() {
                             </svg>
                             <div>
                                 <p className="text-sm text-gray-600">Square Meters</p>
-                                <p className="font-bold  text-black">{property.square_meters} sqm</p>
+                                <p className="font-bold  text-black"> {property.square_meters === 0 ? 'n/a sqm' : `${property.square_meters} sqm`}</p>
                             </div>
                         </div>
                         <div className="bg-gray-200 p-4 rounded-lg flex items-center">
@@ -118,12 +118,26 @@ export default function Property() {
                                 <p className="text-sm text-gray-600">Reference</p>
                                 <p className="font-bold text-black">{property.reference}</p>
                             </div>
+                          
                         </div>
                     </div>
+                    <div>
+                    <a 
+  className="underline text-2xl text-blue-600 hover:text-blue-800 visited:text-purple-600" 
+  href={property.link} 
+  target="_blank" 
+  rel="noopener noreferrer"
+>
+  Visit Website!
+</a>
 
+  <br/><br/>                              
+</div>
+  
                    
                     <div className="mb-8">
-                        <h2 className="text-2xl font-bold text-gray-900 mb-4">Property Description</h2>
+                        <h2 className="text-2xl font-bold text-gray-900 mb-4">Project description</h2>
+                       
                         <p className="text-gray-700 leading-relaxed">
                             {property.description}
                         </p>
