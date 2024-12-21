@@ -1,4 +1,3 @@
-// app/page.js
 "use client";
 
 import { useState, useEffect } from "react";
@@ -13,6 +12,7 @@ function Home() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    // Filter states
     const [search, setSearch] = useState("");
     const [minPrice, setMinPrice] = useState("");
     const [maxPrice, setMaxPrice] = useState("");
@@ -84,19 +84,27 @@ function Home() {
     return (
         <div className="min-h-screen bg-gray-50">
             <Navigation />
+            
+            {/* Main Container */}
             <div className="py-12 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-7xl mx-auto">
-                    <div className="bg-white shadow-xl rounded-2xl overflow-hidden">
-                        <div className="bg-gradient-to-r from-blue-600 to-blue-400 p-6">
-                            <h1 className="text-4xl font-extrabold text-white text-center tracking-tight">
+
+                    {/* Outer Card */}
+                    <div className="bg-white shadow-md rounded-lg">
+
+                        {/* Title / Heading Section */}
+                        <div className="p-6  bg-[#E6FAF1]">
+                            <h1 className="text-3xl font-extrabold text-[#0C573C] text-center">
                                 Real Estate Listings
                             </h1>
                         </div>
 
-                        <div className="p-6 bg-gray-50">
-                            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        {/* Filters Section */}
+                        <div className="p-6 bg-white border-t border-gray-200">
+                            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                                {/* Search */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    <label className="block text-sm font-medium text-[#0C573C] mb-2">
                                         Search Location
                                     </label>
                                     <input
@@ -104,79 +112,62 @@ function Home() {
                                         value={search}
                                         onChange={(e) => setSearch(e.target.value)}
                                         placeholder="e.g., Cas Concos"
-                                        className="text-black w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+                                        className="w-full p-3 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0C573C]"
                                     />
                                 </div>
 
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                                        Property Type
-                                    </label>
-                                    <select
-                                        value={category}
-                                        onChange={(e) => setCategory(e.target.value)}
-                                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200 text-black"
-                                    >
-                                        <option value="" className="text-black bg-white">
-                                            All Categories
-                                        </option>
-                                        <option value="plot of land" className="text-black bg-white">
-                                            Plot of Land
-                                        </option>
-                                        <option value="chalet / villa" className="text-black bg-white">
-                                            Chalet / Villa
-                                        </option>
-                                        <option value="finca / country house" className="text-black bg-white">
-                                            Finca / Country House
-                                        </option>
-                                        <option value="apartment" className="text-black bg-white">
-                                            Apartment
-                                        </option>
-                                        <option value="town house / village house" className="text-black bg-white">
-                                            Town house / Village house
-                                        </option>
-                                        <option value="terraced house / semi-detached house" className="text-black bg-white">
-                                            Terraced house / Semi-detached house
-                                        </option>
-                                    </select>
-                                </div>
+                                
+                               
+                                            <div>
+                                                <label className="block text-sm font-medium text-[#0C573C] mb-2">
+                                                    Property Type
+                                                </label>
+                                                <select
+                                                    value={category}
+                                                    onChange={(e) => setCategory(e.target.value)}
+                                                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0C573C] text-black" // Ensures selected value is black
+                                                >
+                                                    <option value="" className="text-black">All Categories</option>
+                                                    <option value="plot of land" className="text-black">Plot of Land</option>
+                                                    <option value="apartment" className="text-black">Apartment</option>
+                                                    <option value="chalet / villa" className="text-black">Chalet / Villa</option>
+                                                    <option value="finca / country house" className="text-black">Finca / Country House</option>
+                                                </select>
+                                            </div>
+                                                         
 
+                                {/* Price Range */}
                                 <div className="flex space-x-2">
                                     <div className="w-1/2">
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label className="block text-sm font-medium text-[#0C573C] mb-2">
                                             Min Price
                                         </label>
                                         <input
                                             type="text"
                                             value={minPrice}
-                                            onChange={(e) => {
-                                                const value = e.target.value.replace(/[^0-9]/g, '');
-                                                setMinPrice(value);
-                                            }}
+                                            onChange={(e) => setMinPrice(e.target.value.replace(/[^0-9]/g, ''))}
                                             placeholder="Min"
-                                            className="text-black w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+                                            className="w-full p-3 text-black  border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0C573C]"
                                         />
                                     </div>
                                     <div className="w-1/2">
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label className="block text-sm font-medium text-[#0C573C] mb-2">
                                             Max Price
                                         </label>
                                         <input
                                             type="text"
                                             value={maxPrice}
-                                            onChange={(e) => {
-                                                const value = e.target.value.replace(/[^0-9]/g, '');
-                                                setMaxPrice(value);
-                                            }}
+                                            onChange={(e) => setMaxPrice(e.target.value.replace(/[^0-9]/g, ''))}
                                             placeholder="Max"
-                                            className="text-black w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+                                            className="w-full p-3  text-black  border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0C573C]"
                                         />
                                     </div>
                                 </div>
 
+                                {/* Bedrooms / Bathrooms */}
                                 <div className="flex space-x-2">
                                     <div className="w-1/2">
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label className="block text-sm font-medium text-[#0C573C] mb-2">
                                             Bedrooms
                                         </label>
                                         <input
@@ -184,11 +175,11 @@ function Home() {
                                             value={minBedrooms}
                                             onChange={(e) => setMinBedrooms(Number(e.target.value))}
                                             placeholder="Min"
-                                            className="text-black w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+                                            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0C573C]"
                                         />
                                     </div>
                                     <div className="w-1/2">
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        <label className="block text-sm font-medium text-[#0C573C] mb-2">
                                             Bathrooms
                                         </label>
                                         <input
@@ -196,30 +187,32 @@ function Home() {
                                             value={minBathrooms}
                                             onChange={(e) => setMinBathrooms(Number(e.target.value))}
                                             placeholder="Min"
-                                            className="text-black w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+                                            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0C573C]"
                                         />
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="mt-6 flex justify-end">
+                            {/* Search Button */}
+                            <div className="mt-6 text-right">
                                 <button
                                     onClick={applyFilters}
-                                    className="bg-blue-600 text-white px-8 py-3 rounded-lg shadow-md hover:bg-blue-700 transition-all duration-300 transform hover:-translate-y-1 hover:scale-105"
+                                    className="bg-[#0C573C] text-white px-6 py-2 rounded-md hover:bg-[#09422D] transition"
                                 >
                                     Search Properties
                                 </button>
                             </div>
                         </div>
 
+                        {/* Results Section with faint green background */}
                         {filteredProperties.length > 0 ? (
-                            <div className="p-6 bg-white">
+                            <div className="p-6 bg-[#E6FAF1]">
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                     {filteredProperties.map((property) => (
                                         <Card
                                             key={property.id}
                                             photo={property.photos?.[0] || "https://via.placeholder.com/300"}
-                                            price={property.price !== null ? property.price : "$"}
+                                            price={property.price || "$"}
                                             squareMeter={property.square_meters || "__"}
                                             region={property.region || "Unknown"}
                                             category={property.category || "Uncategorized"}
@@ -231,7 +224,7 @@ function Home() {
                                 </div>
                             </div>
                         ) : (
-                            <div className="p-12 text-center bg-gray-50">
+                            <div className="p-12 text-center bg-[#E6FAF1]">
                                 <p className="text-xl text-gray-500">
                                     No properties found. Try adjusting your search filters.
                                 </p>
