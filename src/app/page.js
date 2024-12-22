@@ -26,7 +26,7 @@ function Home() {
     const loadProperties = async () => {
       try {
         setLoading(true);
-        const data = await fetchProperties();
+        const data = await fetchProperties({});
         setProperties(data || []);
         setFilteredProperties(data || []);
       } catch (err) {
@@ -39,31 +39,29 @@ function Home() {
     loadProperties();
   }, []);
 
-  const applyFilters = () => {
-    const filtered = properties.filter((property) => {
-      const price = property.price || 0;
-      const region = property.region?.toLowerCase() || "";
-      const reference = property.reference?.toLowerCase() || "";
-      const description = property.description?.toLowerCase() || "";
-      const categoryValue = property.category?.toLowerCase() || "";
-      const bedrooms = property.bedrooms || 0;
-      const bathrooms = property.bathrooms || 0;
-
-      return (
-        description.includes(descriptionSearch.toLowerCase()) &&
-        region.includes(locationSearch.toLowerCase()) &&
-        (minPrice === "" || price >= Number(minPrice)) &&
-        (maxPrice === "" || price <= Number(maxPrice)) &&
-        (category === "" || categoryValue === category) &&
-        bedrooms >= minBedrooms &&
-        bathrooms >= minBathrooms
-      );
-    });
-    setFilteredProperties(filtered);
-    setSearchSuccess(true);
-    setTimeout(() => {
-      setSearchSuccess(false);
-    }, 2000);
+  const applyFilters = async () => {
+    try {
+      setLoading(true);
+      const data = await fetchProperties({
+        description: descriptionSearch || undefined,
+        region: locationSearch || undefined,
+        category: category || undefined,
+        min_price: minPrice ? Number(minPrice) : undefined,
+        max_price: maxPrice ? Number(maxPrice) : undefined,
+        bedrooms: minBedrooms || undefined,
+        bathrooms: minBathrooms || undefined,
+      });
+      setFilteredProperties(data || []);
+      setSearchSuccess(true);
+      setTimeout(() => {
+        setSearchSuccess(false);
+      }, 2000);
+    } catch (err) {
+      setError("Failed to fetch filtered properties. Please try again later.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const downloadFile = async (type) => {
@@ -179,11 +177,21 @@ function Home() {
                     onChange={(e) => setCategory(e.target.value)}
                     className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0C573C] text-black"
                   >
-                    <option value="" className="text-black">All Categories</option>
-                    <option value="plot of land" className="text-black">Plot of Land</option>
-                    <option value="apartment" className="text-black">Apartment</option>
-                    <option value="chalet / villa" className="text-black">Chalet / Villa</option>
-                    <option value="finca / country house" className="text-black">Finca / Country House</option>
+                    <option value="" className="text-black">
+                      All Categories
+                    </option>
+                    <option value="plot of land" className="text-black">
+                      Plot of Land
+                    </option>
+                    <option value="apartment" className="text-black">
+                      Apartment
+                    </option>
+                    <option value="chalet / villa" className="text-black">
+                      Chalet / Villa
+                    </option>
+                    <option value="finca / country house" className="text-black">
+                      Finca / Country House
+                    </option>
                   </select>
                 </div>
                 <div className="flex space-x-2">
@@ -194,7 +202,7 @@ function Home() {
                     <input
                       type="text"
                       value={minPrice}
-                      onChange={(e) => setMinPrice(e.target.value.replace(/[^0-9]/g, ''))}
+                      onChange={(e) => setMinPrice(e.target.value.replace(/[^0-9]/g, ""))}
                       placeholder="Min"
                       className="w-full p-3 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0C573C]"
                     />
@@ -206,7 +214,7 @@ function Home() {
                     <input
                       type="text"
                       value={maxPrice}
-                      onChange={(e) => setMaxPrice(e.target.value.replace(/[^0-9]/g, ''))}
+                      onChange={(e) => setMaxPrice(e.target.value.replace(/[^0-9]/g, ""))}
                       placeholder="Max"
                       className="w-full p-3 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0C573C]"
                     />
