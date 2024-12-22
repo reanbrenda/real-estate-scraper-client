@@ -1,9 +1,37 @@
 "use client";
 import { useState, useEffect } from "react";
-import { fetchProperties } from "./api/properties";
 import { withAuth } from "../components/AuthGuard";
 import Card from "../components/Card";
 import Navigation from "../components/Navigation";
+
+const fetchProperties = async (filters = {}) => {
+  const { description, region, category, minPrice, maxPrice, bedrooms, bathrooms } = filters;
+  const params = new URLSearchParams({
+    skip: "0",
+    limit: "100",
+    ...(description && { description }),
+    ...(region && { region }),
+    ...(category && { category }),
+    ...(minPrice && { min_price: minPrice }),
+    ...(maxPrice && { max_price: maxPrice }),
+    ...(bedrooms && { bedrooms }),
+    ...(bathrooms && { bathrooms }),
+  });
+
+  const response = await fetch(`https://real-estate-scraper-api.onrender.com/properties?${params}`, {
+    method: 'GET',
+    headers: {
+      'accept': 'application/json',
+    },
+    credentials: 'include',
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch properties');
+  }
+
+  return response.json();
+};
 
 function Home() {
   const [properties, setProperties] = useState([]);
@@ -26,7 +54,7 @@ function Home() {
     const loadProperties = async () => {
       try {
         setLoading(true);
-        const data = await fetchProperties({});
+        const data = await fetchProperties();
         setProperties(data || []);
         setFilteredProperties(data || []);
       } catch (err) {
@@ -42,22 +70,23 @@ function Home() {
   const applyFilters = async () => {
     try {
       setLoading(true);
-      const data = await fetchProperties({
-        description: descriptionSearch || undefined,
-        region: locationSearch || undefined,
-        category: category || undefined,
-        min_price: minPrice ? Number(minPrice) : undefined,
-        max_price: maxPrice ? Number(maxPrice) : undefined,
-        bedrooms: minBedrooms || undefined,
-        bathrooms: minBathrooms || undefined,
-      });
-      setFilteredProperties(data || []);
+      const filters = {
+        ...(descriptionSearch && { description: descriptionSearch }),
+        ...(locationSearch && { region: locationSearch }),
+        ...(category && { category }),
+        ...(minPrice && { minPrice }),
+        ...(maxPrice && { maxPrice }),
+        ...(minBedrooms > 0 && { bedrooms: minBedrooms }),
+        ...(minBathrooms > 0 && { bathrooms: minBathrooms }),
+      };
+      const filteredData = await fetchProperties(filters);
+      setFilteredProperties(filteredData || []);
       setSearchSuccess(true);
       setTimeout(() => {
         setSearchSuccess(false);
       }, 2000);
     } catch (err) {
-      setError("Failed to fetch filtered properties. Please try again later.");
+      setError("Failed to apply filters. Please try again later.");
       console.error(err);
     } finally {
       setLoading(false);
@@ -65,13 +94,19 @@ function Home() {
   };
 
   const downloadFile = async (type) => {
+    
     const propertyIds = filteredProperties.map((property) => property.id);
+
+   
     if (propertyIds.length === 0) {
       alert("No properties selected for download.");
       return;
     }
+
     setIsDownloading(true);
+
     try {
+      
       const response = await fetch(
         type === "pdf"
           ? "https://real-estate-scraper-api.onrender.com/export/pdf"
@@ -86,17 +121,21 @@ function Home() {
           body: JSON.stringify({ property_ids: propertyIds }),
         }
       );
+
+     
       if (!response.ok) {
         if (response.status === 401) {
           throw new Error("Unauthorized. Please log in and try again.");
         }
         throw new Error("Failed to download file");
       }
+
+      
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `properties.${type}`;
+      a.download = `properties.${type}`;  
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -104,6 +143,7 @@ function Home() {
       console.error("Error downloading file:", error);
       alert(error.message || "Failed to download file. Please try again.");
     } finally {
+     
       setIsDownloading(false);
     }
   };
@@ -167,7 +207,6 @@ function Home() {
                     className="w-full p-3 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0C573C]"
                   />
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-[#0C573C] mb-2">
                     Property Type
@@ -177,21 +216,10 @@ function Home() {
                     onChange={(e) => setCategory(e.target.value)}
                     className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0C573C] text-black"
                   >
-                    <option value="" className="text-black">
-                      All Categories
-                    </option>
-                    <option value="plot of land" className="text-black">
-                      Plot of Land
-                    </option>
-                    <option value="apartment" className="text-black">
-                      Apartment
-                    </option>
-                    <option value="chalet / villa" className="text-black">
-                      Chalet / Villa
-                    </option>
-                    <option value="finca / country house" className="text-black">
-                      Finca / Country House
-                    </option>
+                    <option value="" className="text-black">All Categories</option>
+                    <option value="Plot of land" className="text-black">Plot of land</option>
+                    <option value="Chalet / Villa" className="text-black">Chalet / Villa</option>
+                    <option value="Finca / Country house" className="text-black">Finca / Country House</option>
                   </select>
                 </div>
                 <div className="flex space-x-2">
@@ -202,7 +230,7 @@ function Home() {
                     <input
                       type="text"
                       value={minPrice}
-                      onChange={(e) => setMinPrice(e.target.value.replace(/[^0-9]/g, ""))}
+                      onChange={(e) => setMinPrice(e.target.value.replace(/[^0-9]/g, ''))}
                       placeholder="Min"
                       className="w-full p-3 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0C573C]"
                     />
@@ -214,7 +242,7 @@ function Home() {
                     <input
                       type="text"
                       value={maxPrice}
-                      onChange={(e) => setMaxPrice(e.target.value.replace(/[^0-9]/g, ""))}
+                      onChange={(e) => setMaxPrice(e.target.value.replace(/[^0-9]/g, ''))}
                       placeholder="Max"
                       className="w-full p-3 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0C573C]"
                     />
@@ -251,9 +279,7 @@ function Home() {
                 <button
                   onClick={applyFilters}
                   className={`px-6 py-2 rounded-md transition-all duration-300 ${
-                    searchSuccess
-                      ? "bg-green-500 hover:bg-green-600"
-                      : "bg-[#0C573C] hover:bg-[#09422D]"
+                    searchSuccess ? "bg-green-500 hover:bg-green-600" : "bg-[#0C573C] hover:bg-[#09422D]"
                   } text-white`}
                 >
                   {searchSuccess ? "Search Successful!" : "Search Properties"}
@@ -317,3 +343,4 @@ function Home() {
 }
 
 export default withAuth(Home);
+
