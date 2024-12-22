@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import { withAuth } from "../components/AuthGuard";
 import Card from "../components/Card";
 import Navigation from "../components/Navigation";
+import { useRouter } from "next/router";  // Import useRouter for reading URL query params
+
 
 const fetchProperties = async (filters = {}) => {
   const { description, region, category, minPrice, maxPrice, bedrooms, bathrooms } = filters;
@@ -42,6 +44,7 @@ function Home() {
 
   // Filter states
   const [descriptionSearch, setDescriptionSearch] = useState("");
+  
   const [locationSearch, setLocationSearch] = useState("");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
