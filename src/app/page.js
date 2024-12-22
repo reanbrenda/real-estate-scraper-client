@@ -10,6 +10,7 @@ function Home() {
   const [filteredProperties, setFilteredProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchSuccess, setSearchSuccess] = useState(false);
 
   // Filter states
   const [descriptionSearch, setDescriptionSearch] = useState("");
@@ -19,6 +20,7 @@ function Home() {
   const [category, setCategory] = useState("");
   const [minBedrooms, setMinBedrooms] = useState(0);
   const [minBathrooms, setMinBathrooms] = useState(0);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   useEffect(() => {
     const loadProperties = async () => {
@@ -41,7 +43,6 @@ function Home() {
     const filtered = properties.filter((property) => {
       const price = property.price || 0;
       const region = property.region?.toLowerCase() || "";
-      const [platform, setPlatform] = useState("");
       const reference = property.reference?.toLowerCase() || "";
       const description = property.description?.toLowerCase() || "";
       const categoryValue = property.category?.toLowerCase() || "";
@@ -59,9 +60,11 @@ function Home() {
       );
     });
     setFilteredProperties(filtered);
+    setSearchSuccess(true);
+    setTimeout(() => {
+      setSearchSuccess(false);
+    }, 2000);
   };
-
-  const [isDownloading, setIsDownloading] = useState(false);
 
   const downloadFile = async (type) => {
     const propertyIds = filteredProperties.map((property) => property.id);
@@ -239,15 +242,19 @@ function Home() {
               <div className="mt-6 text-right">
                 <button
                   onClick={applyFilters}
-                  className="bg-[#0C573C] text-white px-6 py-2 rounded-md hover:bg-[#09422D] transition"
+                  className={`px-6 py-2 rounded-md transition-all duration-300 ${
+                    searchSuccess
+                      ? "bg-green-500 hover:bg-green-600"
+                      : "bg-[#0C573C] hover:bg-[#09422D]"
+                  } text-white`}
                 >
-                  Search Properties
+                  {searchSuccess ? "Search Successful!" : "Search Properties"}
                 </button>
               </div>
             </div>
             {filteredProperties.length > 0 ? (
               <div className="p-6 bg-[#E6FAF1]">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 ">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredProperties.map((property) => (
                     <Card
                       key={property.id}
@@ -302,4 +309,3 @@ function Home() {
 }
 
 export default withAuth(Home);
-
