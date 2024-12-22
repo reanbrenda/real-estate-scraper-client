@@ -272,7 +272,7 @@ const PhotoModal = ({ photos, currentPhotoIndex, onClose, onNext, onPrevious }) 
                       )}
                   </div>
                   <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-                      <EnergyRatingChart highlightedRating="C" />
+                      <EnergyRatingChart highlightedRating={property.energy_rating} />
                   </div>
               </div>
           </div>
