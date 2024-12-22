@@ -95,7 +95,7 @@ function Home() {
 
   const downloadFile = async (type) => {
     
-    const propertyIds = filteredProperties.map((property) => property.id);
+    const propertyIds = filteredProperties.slice(0, 3).map((property) => property.id);
 
    
     if (propertyIds.length === 0) {
@@ -218,6 +218,7 @@ function Home() {
                   >
                     <option value="" className="text-black">All Categories</option>
                     <option value="Plot of land" className="text-black">Plot of land</option>
+
                     <option value="Chalet / Villa" className="text-black">Chalet / Villa</option>
                     <option value="Finca / Country house" className="text-black">Finca / Country House</option>
                   </select>
