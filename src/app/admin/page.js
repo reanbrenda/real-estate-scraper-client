@@ -97,7 +97,7 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="p-8 max-w-6xl mx-auto">
+    <div className="p-8 max-w-6xl mx-auto bg-white">
       {/* Dashboard Header */}
       <div className="mb-8 flex justify-between items-center">
         <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
@@ -147,7 +147,7 @@ export default function AdminDashboard() {
                           disabled
                           className="px-4 py-2 bg-gray-400 text-white rounded-lg cursor-not-allowed text-sm font-medium"
                         >
-                          Cannot Delete
+                        Delete
                         </button>
                       ) : (
                         <button
@@ -197,7 +197,7 @@ export default function AdminDashboard() {
                     type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4 py-2   text-black border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   />
                 </div>
                 <div>
@@ -209,7 +209,7 @@ export default function AdminDashboard() {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4  text-black  py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   />
                 </div>
               </div>
