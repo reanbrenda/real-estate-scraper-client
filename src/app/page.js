@@ -276,7 +276,7 @@ function Home() {
                     className={`px-4 py-2 rounded-md transition ${
                       isDownloading
                         ? "bg-gray-400 cursor-not-allowed text-gray-800"
-                        : "bg-blue-500 text-white hover:bg-blue-700"
+                        : "bg-green-500 text-white hover:bg-blue-700"
                     }`}
                   >
                     {isDownloading ? "Downloading PDF..." : "Download as PDF"}
@@ -286,8 +286,8 @@ function Home() {
                     disabled={isDownloading}
                     className={`px-4 py-2 rounded-md transition ${
                       isDownloading
-                        ? "bg-gray-400 cursor-not-allowed text-gray-800"
-                        : "bg-green-500 text-white hover:bg-green-700"
+                        ? "bg-green-400 cursor-not-allowed text-gray-800"
+                        : "bg-green-900 text-white hover:bg-green-700"
                     }`}
                   >
                     {isDownloading ? "Downloading CSV..." : "Download as CSV"}
