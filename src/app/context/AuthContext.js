@@ -66,10 +66,19 @@ export const AuthProvider = ({ children }) => {
         method: 'GET',
         credentials: 'include',
       });
-
+  
+      const adminResponse = await fetch('https://real-estate-scraper-api.onrender.com/auth/check-admin', {
+        method: 'GET',
+        credentials: 'include',
+      });
+  
+      const isAdminData = await adminResponse.json();
+  
       if (response.ok) {
         const userData = await response.json();
-        setUser(userData);
+        console.log('User Data:', userData);
+        
+        setUser({ ...userData, isAdmin: isAdminData.is_admin });
       } else {
         setUser(null);
       }
@@ -80,6 +89,7 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
     }
   };
+  
 
   return (
     <AuthContext.Provider value={{ 

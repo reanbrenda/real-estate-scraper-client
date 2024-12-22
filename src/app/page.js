@@ -59,6 +59,57 @@ function Home() {
         setFilteredProperties(filtered);
     };
 
+    const [isDownloading, setIsDownloading] = useState(false); // New state variable
+
+const downloadFile = async (type) => {
+  const propertyIds = filteredProperties.map((property) => property.id);
+
+  if (propertyIds.length === 0) {
+    alert("No properties selected for download.");
+    return;
+  }
+
+  setIsDownloading(true); 
+  try {
+    const response = await fetch(
+      type === "pdf"
+        ? "https://real-estate-scraper-api.onrender.com/export/pdf"
+        : "https://real-estate-scraper-api.onrender.com/export/csv",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        credentials: "include", 
+        body: JSON.stringify({ property_ids: propertyIds }),
+      }
+    );
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        throw new Error("Unauthorized. Please log in and try again.");
+      }
+      throw new Error("Failed to download file");
+    }
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `properties.${type}`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  } catch (error) {
+    console.error("Error downloading file:", error);
+    alert(error.message || "Failed to download file. Please try again.");
+  } finally {
+    setIsDownloading(false); 
+  }
+};
+
+
     if (loading) {
         return (
             <>
@@ -193,7 +244,7 @@ function Home() {
                                 </div>
                             </div>
 
-                            {/* Search Button */}
+                           
                             <div className="mt-6 text-right">
                                 <button
                                     onClick={applyFilters}
@@ -204,7 +255,7 @@ function Home() {
                             </div>
                         </div>
 
-                        {/* Results Section with faint green background */}
+                        
                         {filteredProperties.length > 0 ? (
                             <div className="p-6 bg-[#E6FAF1]">
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -221,8 +272,35 @@ function Home() {
                                             reference={property.reference || "No reference"}
                                         />
                                     ))}
+                               </div>
+
+                               <div className="mt-6 flex space-x-4 justify-end">
+                                <button
+                                    onClick={() => downloadFile("pdf")}
+                                    disabled={isDownloading} 
+                                    className={`px-4 py-2 rounded-md transition ${
+                                    isDownloading
+                                        ? "bg-gray-400 cursor-not-allowed text-gray-800"
+                                        : "bg-blue-500 text-white hover:bg-blue-700"
+                                    }`}
+                                >
+                                    {isDownloading ? "Downloading PDF..." : "Download as PDF"}
+                                </button>
+                                <button
+                                    onClick={() => downloadFile("csv")}
+                                    disabled={isDownloading} 
+                                    className={`px-4 py-2 rounded-md transition ${
+                                    isDownloading
+                                        ? "bg-gray-400 cursor-not-allowed text-gray-800"
+                                        : "bg-green-500 text-white hover:bg-green-700"
+                                    }`}
+                                >
+                                    {isDownloading ? "Downloading CSV..." : "Download as CSV"}
+                                </button>
                                 </div>
-                            </div>
+
+            
+                                 </div>
                         ) : (
                             <div className="p-12 text-center bg-[#E6FAF1]">
                                 <p className="text-xl text-gray-500">

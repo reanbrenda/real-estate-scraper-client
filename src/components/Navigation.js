@@ -46,8 +46,16 @@ export default function Navigation() {
               >
                 Login
               </Link>
-            )}
-          </div>
+            
+            
+            )
+            }
+          {isAuthenticated && user.isAdmin && (
+            <Link href="/admin" className="text-white">
+              Admin
+            </Link>
+          )}
+                    </div>
         </div>
       </div>
     </nav>
