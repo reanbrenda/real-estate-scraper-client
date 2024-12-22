@@ -295,9 +295,9 @@ function Home() {
                       key={property.id}
                       photo={property.photos?.[0] || "https://via.placeholder.com/300"}
                       price={property.price || "$"}
-                      squareMeter={property.square_meters || "__"}
-                      region={property.region || "Unknown"}
-                      category={property.category || "Uncategorized"}
+                      squareMeter={property.square_meters === 0 ? "" : property.square_meters || "__"}
+                      region={property.region === "None" ? "" : property.region || "Unknown"}
+                      category={property.category === "None" ? "" : property.category || "Uncategorized"}
                       bedrooms={property.bedrooms || 0}
                       bathrooms={property.bathrooms || 0}
                       reference={property.reference || "No reference"}
