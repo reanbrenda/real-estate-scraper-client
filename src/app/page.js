@@ -224,7 +224,12 @@ function Home() {
 
                     <option value="Chalet / Villa" className="text-black">Chalet / Villa</option>
                     <option value="Finca / Country house" className="text-black">Finca / Country House</option>
+                    <option value="Apartment" className="text-black">Apartment </option>
+                    <option value="House" className="text-black">House</option>
+                    <option value="Estate / Manor house" className="text-black"> Estate / Manor house</option>
+                    
                   </select>
+                 
                 </div>
                 <div className="flex space-x-2">
                   <div className="w-1/2">
