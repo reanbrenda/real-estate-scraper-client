@@ -42,6 +42,9 @@ function Home() {
   const [error, setError] = useState(null);
   const [searchSuccess, setSearchSuccess] = useState(false);
 
+  const [selectedProperties, setSelectedProperties] = useState([]);
+  const [showSelectionMode, setShowSelectionMode] = useState(false);
+
   // Filter states
   const [descriptionSearch, setDescriptionSearch] = useState("");
   
@@ -52,6 +55,17 @@ function Home() {
   const [minBedrooms, setMinBedrooms] = useState(0);
   const [minBathrooms, setMinBathrooms] = useState(0);
   const [isDownloading, setIsDownloading] = useState(false);
+
+
+
+  const togglePropertySelection = (propertyId) => {
+    setSelectedProperties(prev => {
+      if (prev.includes(propertyId)) {
+        return prev.filter(id => id !== propertyId);
+      }
+      return [...prev, propertyId];
+    });
+  };
 
   useEffect(() => {
     const loadProperties = async () => {
@@ -97,19 +111,24 @@ function Home() {
   };
 
   const downloadFile = async (type) => {
-    
-    const propertyIds = filteredProperties.slice(0, 3).map((property) => property.id);
+    if (!showSelectionMode) {
+      setShowSelectionMode(true);
+      return;
+    }
 
-   
-    if (propertyIds.length === 0) {
-      alert("No properties selected for download.");
+    if (selectedProperties.length === 0) {
+      alert("Please select at least one property to download.");
+      return;
+    }
+
+    if (selectedProperties.length > 4) {
+      alert("Please select no more than 4 properties.");
       return;
     }
 
     setIsDownloading(true);
 
     try {
-      
       const response = await fetch(
         type === "pdf"
           ? "https://real-estate-scraper-api.onrender.com/export/pdf"
@@ -121,11 +140,10 @@ function Home() {
             Accept: "application/json",
           },
           credentials: "include",
-          body: JSON.stringify({ property_ids: propertyIds }),
+          body: JSON.stringify({ property_ids: selectedProperties }),
         }
       );
 
-     
       if (!response.ok) {
         if (response.status === 401) {
           throw new Error("Unauthorized. Please log in and try again.");
@@ -133,20 +151,22 @@ function Home() {
         throw new Error("Failed to download file");
       }
 
-      
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `properties.${type}`;  
+      a.download = `properties.${type}`;
       document.body.appendChild(a);
       a.click();
       a.remove();
+
+      // Reset selection mode after successful download
+      setShowSelectionMode(false);
+      setSelectedProperties([]);
     } catch (error) {
       console.error("Error downloading file:", error);
       alert(error.message || "Failed to download file. Please try again.");
     } finally {
-     
       setIsDownloading(false);
     }
   };
@@ -297,43 +317,86 @@ function Home() {
             </div>
             {filteredProperties.length > 0 ? (
               <div className="p-6 bg-[#E6FAF1]">
+                {showSelectionMode && (
+                  <div className="mb-4 p-4 bg-white rounded-lg shadow">
+                    <p className="text-[#0C573C] font-medium">
+                      Select up to 4 properties to download. Selected: {selectedProperties.length}/4
+                    </p>
+                  </div>
+                )}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredProperties.map((property) => (
-                    <Card
-                      key={property.id}
-                      photo={property.photos?.[0] || "https://via.placeholder.com/300"}
-                      price={property.price || "$"}
-                      squareMeter={property.square_meters === 0 ? "" : property.square_meters || "__"}
-                      region={property.region === "None" ? "" : property.region || "Unknown"}
-                      category={property.category === "None" ? "" : property.category || "Uncategorized"}
-                      bedrooms={property.bedrooms || 0}
-                      bathrooms={property.bathrooms || 0}
-                      reference={property.reference || "No reference"}
-                    />
+                    <div key={property.id} className="relative">
+                      {showSelectionMode && (
+                        <div className="absolute top-2 right-2 z-10">
+                          <input
+                            type="checkbox"
+                            checked={selectedProperties.includes(property.id)}
+                            onChange={() => togglePropertySelection(property.id)}
+                            disabled={selectedProperties.length >= 4 && !selectedProperties.includes(property.id)}
+                            className="w-5 h-5 cursor-pointer accent-[#0C573C]"
+                          />
+                        </div>
+                      )}
+                     <Card
+    key={property.id}
+    photo={property.photos?.[0] || "https://via.placeholder.com/300"}
+    price={property.price || "$"}
+    squareMeter={property.square_meters === 0 ? "" : property.square_meters || "__"}
+    region={property.region === "None" ? "" : property.region || "Unknown"}
+    category={property.category === "None" ? "" : property.category || "Uncategorized"}
+    bedrooms={property.bedrooms || 0}
+    bathrooms={property.bathrooms || 0}
+    reference={property.reference || "No reference"}
+    selectable={showSelectionMode}
+    selected={selectedProperties.includes(property.id)}
+    onSelect={() => togglePropertySelection(property.id)}
+    disabled={selectedProperties.length >= 4 && !selectedProperties.includes(property.id)}
+  />
+                    </div>
                   ))}
                 </div>
                 <div className="mt-6 flex space-x-4 justify-end">
+                  {showSelectionMode && (
+                    <button
+                      onClick={() => {
+                        setShowSelectionMode(false);
+                        setSelectedProperties([]);
+                      }}
+                      className="px-4 py-2 rounded-md bg-gray-500 text-white hover:bg-gray-600 transition"
+                    >
+                      Cancel Selection
+                    </button>
+                  )}
                   <button
                     onClick={() => downloadFile("pdf")}
-                    disabled={isDownloading}
+                    disabled={isDownloading || (showSelectionMode && selectedProperties.length === 0)}
                     className={`px-4 py-2 rounded-md transition ${
-                      isDownloading
+                      isDownloading || (showSelectionMode && selectedProperties.length === 0)
                         ? "bg-gray-400 cursor-not-allowed text-gray-800"
                         : "bg-green-500 text-white hover:bg-blue-700"
                     }`}
                   >
-                    {isDownloading ? "Downloading PDF..." : "Download as PDF"}
+                    {isDownloading 
+                      ? "Downloading PDF..." 
+                      : showSelectionMode 
+                        ? "Download Selected as PDF" 
+                        : "Select Properties for PDF"}
                   </button>
                   <button
                     onClick={() => downloadFile("csv")}
-                    disabled={isDownloading}
+                    disabled={isDownloading || (showSelectionMode && selectedProperties.length === 0)}
                     className={`px-4 py-2 rounded-md transition ${
-                      isDownloading
+                      isDownloading || (showSelectionMode && selectedProperties.length === 0)
                         ? "bg-green-400 cursor-not-allowed text-gray-800"
                         : "bg-green-900 text-white hover:bg-green-700"
                     }`}
                   >
-                    {isDownloading ? "Downloading CSV..." : "Download as CSV"}
+                    {isDownloading 
+                      ? "Downloading CSV..." 
+                      : showSelectionMode 
+                        ? "Download Selected as CSV" 
+                        : "Select Properties for CSV"}
                   </button>
                 </div>
               </div>
@@ -350,6 +413,4 @@ function Home() {
     </div>
   );
 }
-
 export default withAuth(Home);
-
