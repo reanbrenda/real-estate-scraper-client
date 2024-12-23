@@ -338,21 +338,21 @@ function Home() {
                           />
                         </div>
                       )}
-                     <Card
-    key={property.id}
-    photo={property.photos?.[0] || "https://via.placeholder.com/300"}
-    price={property.price || "$"}
-    squareMeter={property.square_meters === 0 ? "" : property.square_meters || "__"}
-    region={property.region === "None" ? "" : property.region || "Unknown"}
-    category={property.category === "None" ? "" : property.category || "Uncategorized"}
-    bedrooms={property.bedrooms || 0}
-    bathrooms={property.bathrooms || 0}
-    reference={property.reference || "No reference"}
-    selectable={showSelectionMode}
-    selected={selectedProperties.includes(property.id)}
-    onSelect={() => togglePropertySelection(property.id)}
-    disabled={selectedProperties.length >= 4 && !selectedProperties.includes(property.id)}
-  />
+              <Card
+              key={property.id}
+              photo={property.photos?.[0] || "https://via.placeholder.com/300"}
+              price={property.price || "$"}
+              squareMeter={property.square_meters === 0 ? "" : property.square_meters || "__"}
+              region={property.region === "None" ? "" : property.region || "Unknown"}
+              category={property.category === "None" ? "" : property.category || "Uncategorized"}
+              bedrooms={property.bedrooms || 0}
+              bathrooms={property.bathrooms || 0}
+              reference={property.reference || "No reference"}
+              selectable={showSelectionMode}
+              selected={selectedProperties.includes(property.id)}
+              onSelect={() => togglePropertySelection(property.id)}
+              disabled={selectedProperties.length >= 4 && !selectedProperties.includes(property.id)}
+            />
                     </div>
                   ))}
                 </div>
