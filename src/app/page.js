@@ -1,10 +1,15 @@
+
 "use client";
 import { useState, useEffect } from "react";
 import { withAuth } from "../components/AuthGuard";
 import Card from "../components/Card";
 import Navigation from "../components/Navigation";
-import { useRouter } from "next/router";  // Import useRouter for reading URL query params
+import { useRouter, useSearchParams } from 'next/navigation';
 
+
+const formatPrice = (price) => {
+  return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+};
 
 const fetchProperties = async (filters = {}) => {
   const { description, region, category, minPrice, maxPrice, bedrooms, bathrooms } = filters;
@@ -36,27 +41,26 @@ const fetchProperties = async (filters = {}) => {
 };
 
 function Home() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [properties, setProperties] = useState([]);
   const [filteredProperties, setFilteredProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchSuccess, setSearchSuccess] = useState(false);
-
   const [selectedProperties, setSelectedProperties] = useState([]);
   const [showSelectionMode, setShowSelectionMode] = useState(false);
-
-  // Filter states
-  const [descriptionSearch, setDescriptionSearch] = useState("");
-  
-  const [locationSearch, setLocationSearch] = useState("");
-  const [minPrice, setMinPrice] = useState("");
-  const [maxPrice, setMaxPrice] = useState("");
-  const [category, setCategory] = useState("");
-  const [minBedrooms, setMinBedrooms] = useState(0);
-  const [minBathrooms, setMinBathrooms] = useState(0);
   const [isDownloading, setIsDownloading] = useState(false);
 
-
+  // Initialize states from URL parameters
+  const [descriptionSearch, setDescriptionSearch] = useState(searchParams.get('description') || '');
+  const [locationSearch, setLocationSearch] = useState(searchParams.get('location') || '');
+  const [minPrice, setMinPrice] = useState(searchParams.get('minPrice') || '');
+  const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') || '');
+  const [category, setCategory] = useState(searchParams.get('category') || '');
+  const [minBedrooms, setMinBedrooms] = useState(Number(searchParams.get('bedrooms')) || 0);
+  const [minBathrooms, setMinBathrooms] = useState(Number(searchParams.get('bathrooms')) || 0);
 
   const togglePropertySelection = (propertyId) => {
     setSelectedProperties(prev => {
@@ -67,35 +71,86 @@ function Home() {
     });
   };
 
+  const selectAllProperties = () => {
+    if (selectedProperties.length === filteredProperties.length) {
+      // If all are selected, deselect all
+      setSelectedProperties([]);
+    } else {
+      // Otherwise select all
+      setSelectedProperties(filteredProperties.map(property => property.id));
+    }
+  };
+
   useEffect(() => {
-    const loadProperties = async () => {
+    const loadFiltersFromURL = async () => {
+      if (!searchParams.toString()) {
+        // If no filters, load all properties
+        try {
+          setLoading(true);
+          const data = await fetchProperties();
+          setProperties(data || []);
+          setFilteredProperties(data || []);
+        } catch (err) {
+          setError("Failed to fetch properties. Please try again later.");
+          console.error(err);
+        } finally {
+          setLoading(false);
+        }
+        return;
+      }
+
       try {
         setLoading(true);
-        const data = await fetchProperties();
-        setProperties(data || []);
-        setFilteredProperties(data || []);
+        const filters = {
+          description: searchParams.get('description'),
+          region: searchParams.get('location'),
+          category: searchParams.get('category'),
+          minPrice: searchParams.get('minPrice'),
+          maxPrice: searchParams.get('maxPrice'),
+          bedrooms: searchParams.get('bedrooms'),
+          bathrooms: searchParams.get('bathrooms'),
+        };
+
+        // Clean up empty filters
+        Object.keys(filters).forEach(key => {
+          if (!filters[key]) delete filters[key];
+        });
+
+        const filteredData = await fetchProperties(filters);
+        setFilteredProperties(filteredData || []);
       } catch (err) {
-        setError("Failed to fetch properties. Please try again later.");
         console.error(err);
+        setError("Failed to load filtered properties.");
       } finally {
         setLoading(false);
       }
     };
-    loadProperties();
-  }, []);
+
+    loadFiltersFromURL();
+  }, [searchParams]);
 
   const applyFilters = async () => {
     try {
       setLoading(true);
       const filters = {
         ...(descriptionSearch && { description: descriptionSearch }),
-        ...(locationSearch && { region: locationSearch }),
+        ...(locationSearch && { location: locationSearch }),
         ...(category && { category }),
         ...(minPrice && { minPrice }),
         ...(maxPrice && { maxPrice }),
         ...(minBedrooms > 0 && { bedrooms: minBedrooms }),
         ...(minBathrooms > 0 && { bathrooms: minBathrooms }),
       };
+
+      // Create URL parameters
+      const params = new URLSearchParams();
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value) params.append(key, value);
+      });
+      
+      // Update URL without refreshing the page
+      window.history.pushState({}, '', `?${params.toString()}`);
+
       const filteredData = await fetchProperties(filters);
       setFilteredProperties(filteredData || []);
       setSearchSuccess(true);
@@ -110,6 +165,12 @@ function Home() {
     }
   };
 
+  const handlePropertyClick = (property) => {
+    const currentUrl = new URL(window.location.href);
+    const queryString = currentUrl.search;
+    router.push(`/property/${property.reference}${queryString}`);
+  };
+
   const downloadFile = async (type) => {
     if (!showSelectionMode) {
       setShowSelectionMode(true);
@@ -118,11 +179,6 @@ function Home() {
 
     if (selectedProperties.length === 0) {
       alert("Please select at least one property to download.");
-      return;
-    }
-
-    if (selectedProperties.length > 4) {
-      alert("Please select no more than 4 properties.");
       return;
     }
 
@@ -160,7 +216,6 @@ function Home() {
       a.click();
       a.remove();
 
-      // Reset selection mode after successful download
       setShowSelectionMode(false);
       setSelectedProperties([]);
     } catch (error) {
@@ -208,7 +263,7 @@ function Home() {
               <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-[#0C573C] mb-2">
-                    Search description
+                  Context Search
                   </label>
                   <input
                     type="text"
@@ -241,15 +296,12 @@ function Home() {
                   >
                     <option value="" className="text-black">All Categories</option>
                     <option value="Plot of land" className="text-black">Plot of land</option>
-
                     <option value="Chalet / Villa" className="text-black">Chalet / Villa</option>
                     <option value="Finca / Country house" className="text-black">Finca / Country House</option>
                     <option value="Apartment" className="text-black">Apartment </option>
                     <option value="House" className="text-black">House</option>
                     <option value="Estate / Manor house" className="text-black"> Estate / Manor house</option>
-                    
                   </select>
-                 
                 </div>
                 <div className="flex space-x-2">
                   <div className="w-1/2">
@@ -304,59 +356,8 @@ function Home() {
                   </div>
                 </div>
               </div>
-              <div className="mt-6 text-right">
-                <button
-                  onClick={applyFilters}
-                  className={`px-6 py-2 rounded-md transition-all duration-300 ${
-                    searchSuccess ? "bg-green-500 hover:bg-green-600" : "bg-[#0C573C] hover:bg-[#09422D]"
-                  } text-white`}
-                >
-                  {searchSuccess ? "Search Successful!" : "Search Properties"}
-                </button>
-              </div>
-            </div>
-            {filteredProperties.length > 0 ? (
-              <div className="p-6 bg-[#E6FAF1]">
-                {showSelectionMode && (
-                  <div className="mb-4 p-4 bg-white rounded-lg shadow">
-                    <p className="text-[#0C573C] font-medium">
-                      Select up to 4 properties to download. Selected: {selectedProperties.length}/4
-                    </p>
-                  </div>
-                )}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredProperties.map((property) => (
-                    <div key={property.id} className="relative">
-                      {showSelectionMode && (
-                        <div className="absolute top-2 right-2 z-10">
-                          <input
-                            type="checkbox"
-                            checked={selectedProperties.includes(property.id)}
-                            onChange={() => togglePropertySelection(property.id)}
-                            disabled={selectedProperties.length >= 4 && !selectedProperties.includes(property.id)}
-                            className="w-5 h-5 cursor-pointer accent-[#0C573C]"
-                          />
-                        </div>
-                      )}
-              <Card
-              key={property.id}
-              photo={property.photos?.[0] || "https://via.placeholder.com/300"}
-              price={property.price || "$"}
-              squareMeter={property.square_meters === 0 ? "" : property.square_meters || "__"}
-              region={property.region === "None" ? "" : property.region || "Unknown"}
-              category={property.category === "None" ? "" : property.category || "Uncategorized"}
-              bedrooms={property.bedrooms || 0}
-              bathrooms={property.bathrooms || 0}
-              reference={property.reference || "No reference"}
-              selectable={showSelectionMode}
-              selected={selectedProperties.includes(property.id)}
-              onSelect={() => togglePropertySelection(property.id)}
-              disabled={selectedProperties.length >= 4 && !selectedProperties.includes(property.id)}
-            />
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-6 flex space-x-4 justify-end">
+              <div className="mt-6 flex justify-between items-center">
+                <div className="flex space-x-4">
                   {showSelectionMode && (
                     <button
                       onClick={() => {
@@ -398,6 +399,63 @@ function Home() {
                         ? "Download Selected as CSV" 
                         : "Select Properties for CSV"}
                   </button>
+                </div>
+                <button
+                  onClick={applyFilters}
+                  className={`px-6 py-2 rounded-md transition-all duration-300 ${
+                    searchSuccess ? "bg-green-500 hover:bg-green-600" : "bg-[#0C573C] hover:bg-[#09422D]"
+                  } text-white`}
+                >
+                  {searchSuccess ? "Search Successful!" : "Search Properties"}
+                </button>
+              </div>
+            </div>
+            {filteredProperties.length > 0 ? (
+              <div className="p-6 bg-[#E6FAF1]">
+                {showSelectionMode && (
+                  <div className="mb-4 p-4 bg-white rounded-lg shadow">
+                    <div className="flex justify-between items-center">
+                      <p className="text-[#0C573C] font-medium">
+                        Selected properties: {selectedProperties.length} of {filteredProperties.length}
+                      </p>
+                      <button
+                        onClick={selectAllProperties}
+                        className="px-4 py-2 rounded-md bg-[#0C573C] text-white hover:bg-[#09422D] transition"
+                      >
+                        {selectedProperties.length === filteredProperties.length ? "Deselect All" : "Select All"}
+                      </button>
+                    </div>
+                  </div>
+                )}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredProperties.map((property) => (
+                    <div key={property.id} className="relative">
+                      {showSelectionMode && (
+                        <div className="absolute top-2 right-2 z-10">
+                          <input
+                            type="checkbox"
+                            checked={selectedProperties.includes(property.id)}
+                            onChange={() => togglePropertySelection(property.id)}
+                            className="w-5 h-5 cursor-pointer accent-[#0C573C]"
+                          />
+                        </div>
+                      )}
+                      <Card
+                        key={property.id}
+                        photo={property.photos?.[0] || "https://via.placeholder.com/300"}
+                        price={formatPrice(property.price)}
+                        squareMeter={property.square_meters === 0 ? "" : property.square_meters || "__"}
+                        region={property.region === "None" ? "" : property.region || "Unknown"}
+                        category={property.category === "None" ? "" : property.category || "Uncategorized"}
+                        bedrooms={property.bedrooms || 0}
+                        bathrooms={property.bathrooms || 0}
+                        reference={property.reference || "No reference"}
+                        selectable={showSelectionMode}
+                        selected={selectedProperties.includes(property.id)}
+                        onSelect={() => togglePropertySelection(property.id)}
+                      />
+                    </div>
+                  ))}
                 </div>
               </div>
             ) : (
