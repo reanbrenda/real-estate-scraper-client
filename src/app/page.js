@@ -1,31 +1,186 @@
-
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { withAuth } from "../components/AuthGuard";
 import Card from "../components/Card";
 import Navigation from "../components/Navigation";
 import { useRouter, useSearchParams } from 'next/navigation';
 
+// Add this new component for location search
+const LocationSearchDropdown = ({ selectedLocations, setSelectedLocations }) => {
+  const [regions, setRegions] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    // Fetch available regions when component mounts
+    const fetchRegions = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('https://real-estate-scraper-api.onrender.com/properties/regions', {
+          method: 'GET',
+          headers: {
+            'accept': 'application/json',
+          },
+          credentials: 'include',
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch regions');
+        }
+
+        const data = await response.json();
+        setRegions(data || []);
+      } catch (err) {
+        console.error('Error fetching regions:', err);
+        setError('Failed to load locations');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRegions();
+  }, []);
+
+  useEffect(() => {
+    // Close dropdown when clicking outside
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const toggleSelection = (region) => {
+    if (selectedLocations.includes(region)) {
+      setSelectedLocations(selectedLocations.filter(loc => loc !== region));
+    } else {
+      setSelectedLocations([...selectedLocations, region]);
+    }
+  };
+
+  const filteredRegions = regions.filter(region => 
+    region.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <label className="block text-sm font-medium text-[#0C573C] mb-2">
+        Search Location
+      </label>
+      <div className="flex flex-wrap mb-2 gap-1">
+        {selectedLocations.map(location => (
+          <span 
+            key={location} 
+            className="inline-flex items-center px-2 py-1 rounded-md text-sm bg-[#E6FAF1] text-[#0C573C] border border-[#0C573C]"
+          >
+            {location}
+            <button 
+              onClick={() => toggleSelection(location)} 
+              className="ml-1 text-[#0C573C] hover:text-red-600"
+            >
+              ×
+            </button>
+          </span>
+        ))}
+      </div>
+      <div className="relative">
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            setIsDropdownOpen(true);
+          }}
+          onClick={() => setIsDropdownOpen(true)}
+          placeholder="e.g., Cas Concos, Palma"
+          className="w-full p-3 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0C573C]"
+        />
+        {loading && (
+          <div className="absolute right-3 top-3">
+            <svg className="animate-spin h-5 w-5 text-[#0C573C]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          </div>
+        )}
+      </div>
+      
+      {isDropdownOpen && filteredRegions.length > 0 && (
+        <div className="absolute z-10 mt-1 w-full bg-white shadow-lg rounded-md max-h-60 overflow-y-auto border border-gray-300">
+          {filteredRegions.map(region => (
+            <div 
+              key={region}
+              onClick={() => toggleSelection(region)}
+              className={`p-2 hover:bg-gray-100 cursor-pointer flex items-center ${
+                selectedLocations.includes(region) ? 'bg-[#E6FAF1]' : ''
+              }`}
+            >
+              <input
+                type="checkbox"
+                checked={selectedLocations.includes(region)}
+                onChange={() => {}}
+                className="mr-2 accent-[#0C573C]"
+              />
+              {region}
+            </div>
+          ))}
+        </div>
+      )}
+      
+      {isDropdownOpen && searchTerm && filteredRegions.length === 0 && (
+        <div className="absolute z-10 mt-1 w-full bg-white shadow-lg rounded-md border border-gray-300 p-2 text-gray-500">
+          No matching locations found
+        </div>
+      )}
+      
+      {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
+    </div>
+  );
+};
 
 const formatPrice = (price) => {
   return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 };
 
+// Modified to properly handle multiple regions
 const fetchProperties = async (filters = {}) => {
-  const { description, region, category, minPrice, maxPrice, bedrooms, bathrooms } = filters;
-  const params = new URLSearchParams({
+  const { description, regions, category, minPrice, maxPrice, bedrooms, bathrooms } = filters;
+  
+  // Create base parameters
+  let params = new URLSearchParams({
     skip: "0",
     limit: "100",
-    ...(description && { description }),
-    ...(region && { region }),
-    ...(category && { category }),
-    ...(minPrice && { min_price: minPrice }),
-    ...(maxPrice && { max_price: maxPrice }),
-    ...(bedrooms && { bedrooms }),
-    ...(bathrooms && { bathrooms }),
   });
 
-  const response = await fetch(`https://real-estate-scraper-api.onrender.com/properties?${params}`, {
+  // Add description if exists
+  if (description) {
+    params.append("description", description);
+  }
+
+  // Add each region individually as a separate parameter
+  if (regions && regions.length > 0) {
+    // The API expects multiple region parameters, not comma-separated
+    regions.forEach(region => {
+      params.append("region", region);
+    });
+  }
+
+  // Add remaining parameters
+  if (category) params.append("category", category);
+  if (minPrice) params.append("min_price", minPrice);
+  if (maxPrice) params.append("max_price", maxPrice);
+  if (bedrooms) params.append("bedrooms", bedrooms);
+  if (bathrooms) params.append("bathrooms", bathrooms);
+
+  const response = await fetch(`https://real-estate-scraper-api.onrender.com/properties?${params.toString()}`, {
     method: 'GET',
     headers: {
       'accept': 'application/json',
@@ -55,7 +210,11 @@ function Home() {
 
   // Initialize states from URL parameters
   const [descriptionSearch, setDescriptionSearch] = useState(searchParams.get('description') || '');
-  const [locationSearch, setLocationSearch] = useState(searchParams.get('location') || '');
+  // Parse multiple locations from URL
+  const [selectedLocations, setSelectedLocations] = useState(() => {
+    const locationParam = searchParams.get('location');
+    return locationParam ? locationParam.split(',') : [];
+  });
   const [minPrice, setMinPrice] = useState(searchParams.get('minPrice') || '');
   const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') || '');
   const [category, setCategory] = useState(searchParams.get('category') || '');
@@ -101,9 +260,13 @@ function Home() {
 
       try {
         setLoading(true);
+        // Get all locations from URL
+        const locationParam = searchParams.get('location');
+        const regions = locationParam ? locationParam.split(',') : [];
+        
         const filters = {
           description: searchParams.get('description'),
-          region: searchParams.get('location'),
+          regions: regions,
           category: searchParams.get('category'),
           minPrice: searchParams.get('minPrice'),
           maxPrice: searchParams.get('maxPrice'),
@@ -113,7 +276,7 @@ function Home() {
 
         // Clean up empty filters
         Object.keys(filters).forEach(key => {
-          if (!filters[key]) delete filters[key];
+          if (!filters[key] || (Array.isArray(filters[key]) && filters[key].length === 0)) delete filters[key];
         });
 
         const filteredData = await fetchProperties(filters);
@@ -134,7 +297,7 @@ function Home() {
       setLoading(true);
       const filters = {
         ...(descriptionSearch && { description: descriptionSearch }),
-        ...(locationSearch && { location: locationSearch }),
+        ...(selectedLocations.length > 0 && { regions: selectedLocations }),
         ...(category && { category }),
         ...(minPrice && { minPrice }),
         ...(maxPrice && { maxPrice }),
@@ -142,11 +305,15 @@ function Home() {
         ...(minBathrooms > 0 && { bathrooms: minBathrooms }),
       };
 
-      // Create URL parameters
+      // Create URL parameters for navigation
       const params = new URLSearchParams();
-      Object.entries(filters).forEach(([key, value]) => {
-        if (value) params.append(key, value);
-      });
+      if (descriptionSearch) params.append('description', descriptionSearch);
+      if (selectedLocations.length > 0) params.append('location', selectedLocations.join(','));
+      if (category) params.append('category', category);
+      if (minPrice) params.append('minPrice', minPrice);
+      if (maxPrice) params.append('maxPrice', maxPrice);
+      if (minBedrooms > 0) params.append('bedrooms', minBedrooms.toString());
+      if (minBathrooms > 0) params.append('bathrooms', minBathrooms.toString());
       
       // Update URL without refreshing the page
       window.history.pushState({}, '', `?${params.toString()}`);
@@ -263,7 +430,7 @@ function Home() {
               <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-[#0C573C] mb-2">
-                  Context Search
+                    Context Search
                   </label>
                   <input
                     type="text"
@@ -274,15 +441,10 @@ function Home() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#0C573C] mb-2">
-                    Search Location
-                  </label>
-                  <input
-                    type="text"
-                    value={locationSearch}
-                    onChange={(e) => setLocationSearch(e.target.value)}
-                    placeholder="e.g., Cas Concos"
-                    className="w-full p-3 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0C573C]"
+                  {/* Replace the old location search with the new component */}
+                  <LocationSearchDropdown 
+                    selectedLocations={selectedLocations} 
+                    setSelectedLocations={setSelectedLocations} 
                   />
                 </div>
                 <div>
@@ -444,9 +606,9 @@ function Home() {
                         key={property.id}
                         photo={property.photos?.[0] || "https://via.placeholder.com/300"}
                         price={formatPrice(property.price)}
-                        squareMeter={property.square_meters === 0 ? "" : property.square_meters || "__"}
-                        region={property.region === "None" ? "" : property.region || "Unknown"}
-                        category={property.category === "None" ? "" : property.category || "Uncategorized"}
+                        squareMeter={property.square_meters || "__"}
+                        region={property.region === "None" ? "" : property.region || ""}
+                        category={property.category === "None" ? "" : property.category || ""}
                         bedrooms={property.bedrooms || 0}
                         bathrooms={property.bathrooms || 0}
                         reference={property.reference || "No reference"}
