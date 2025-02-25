@@ -152,7 +152,12 @@ const formatPrice = (price) => {
 
 // Modified to properly handle multiple regions
 const fetchProperties = async (filters = {}) => {
-  const { description, regions, category, minPrice, maxPrice, bedrooms, bathrooms } = filters;
+  const { description, regions, category, minPrice, maxPrice, minBedrooms, 
+    maxBedrooms,
+    minBathrooms, 
+    maxBathrooms,
+    minSquareMeters,
+    maxSquareMeters} = filters;
   
   // Create base parameters
   let params = new URLSearchParams({
@@ -177,8 +182,12 @@ const fetchProperties = async (filters = {}) => {
   if (category) params.append("category", category);
   if (minPrice) params.append("min_price", minPrice);
   if (maxPrice) params.append("max_price", maxPrice);
-  if (bedrooms) params.append("bedrooms", bedrooms);
-  if (bathrooms) params.append("bathrooms", bathrooms);
+  if (minBedrooms) params.append("min_bedrooms", minBedrooms);
+  if (maxBedrooms) params.append("max_bedrooms", maxBedrooms);
+  if (minBathrooms) params.append("min_bathrooms", minBathrooms);
+  if (maxBathrooms) params.append("max_bathrooms", maxBathrooms);
+  if (minSquareMeters) params.append("min_square_meters", minSquareMeters);
+  if (maxSquareMeters) params.append("max_square_meters", maxSquareMeters);
 
   const response = await fetch(`https://real-estate-scraper-api.onrender.com/properties?${params.toString()}`, {
     method: 'GET',
@@ -218,8 +227,14 @@ function Home() {
   const [minPrice, setMinPrice] = useState(searchParams.get('minPrice') || '');
   const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') || '');
   const [category, setCategory] = useState(searchParams.get('category') || '');
-  const [minBedrooms, setMinBedrooms] = useState(Number(searchParams.get('bedrooms')) || 0);
-  const [minBathrooms, setMinBathrooms] = useState(Number(searchParams.get('bathrooms')) || 0);
+  const [minBedrooms, setMinBedrooms] = useState(Number(searchParams.get('minBedrooms')) || 0);
+  const [maxBedrooms, setMaxBedrooms] = useState(Number(searchParams.get('maxBedrooms')) || 0);
+  const [minBathrooms, setMinBathrooms] = useState(Number(searchParams.get('minBathrooms')) || 0);
+  const [maxBathrooms, setMaxBathrooms] = useState(Number(searchParams.get('maxBathrooms')) || 0);
+  const [minSquareMeters, setMinSquareMeters] = useState(Number(searchParams.get('minSquareMeters')) || 0);
+  const [maxSquareMeters, setMaxSquareMeters] = useState(Number(searchParams.get('maxSquareMeters')) || 0);
+
+  
 
   const togglePropertySelection = (propertyId) => {
     setSelectedProperties(prev => {
@@ -272,6 +287,12 @@ function Home() {
           maxPrice: searchParams.get('maxPrice'),
           bedrooms: searchParams.get('bedrooms'),
           bathrooms: searchParams.get('bathrooms'),
+          minBedrooms: searchParams.get('minBedrooms'),
+          maxBedrooms: searchParams.get('maxBedrooms'),
+          minBathrooms: searchParams.get('minBathrooms'),
+          maxBathrooms: searchParams.get('maxBathrooms'),
+          minSquareMeters: searchParams.get('minSquareMeters'),
+          maxSquareMeters: searchParams.get('maxSquareMeters'),
         };
 
         // Clean up empty filters
@@ -301,8 +322,12 @@ function Home() {
         ...(category && { category }),
         ...(minPrice && { minPrice }),
         ...(maxPrice && { maxPrice }),
-        ...(minBedrooms > 0 && { bedrooms: minBedrooms }),
-        ...(minBathrooms > 0 && { bathrooms: minBathrooms }),
+        ...(minBedrooms > 0 && { minBedrooms }),
+        ...(maxBedrooms > 0 && { maxBedrooms }),
+        ...(minBathrooms > 0 && { minBathrooms }),
+        ...(maxBathrooms > 0 && { maxBathrooms }),
+        ...(minSquareMeters > 0 && { minSquareMeters }),
+        ...(maxSquareMeters > 0 && { maxSquareMeters }),
       };
 
       // Create URL parameters for navigation
@@ -312,8 +337,12 @@ function Home() {
       if (category) params.append('category', category);
       if (minPrice) params.append('minPrice', minPrice);
       if (maxPrice) params.append('maxPrice', maxPrice);
-      if (minBedrooms > 0) params.append('bedrooms', minBedrooms.toString());
-      if (minBathrooms > 0) params.append('bathrooms', minBathrooms.toString());
+      if (minBedrooms > 0) params.append('minBedrooms', minBedrooms.toString());
+      if (maxBedrooms > 0) params.append('maxBedrooms', maxBedrooms.toString());
+      if (minBathrooms > 0) params.append('minBathrooms', minBathrooms.toString());
+      if (maxBathrooms > 0) params.append('maxBathrooms', maxBathrooms.toString());
+      if (minSquareMeters > 0) params.append('minSquareMeters', minSquareMeters.toString());
+      if (maxSquareMeters > 0) params.append('maxSquareMeters', maxSquareMeters.toString());
       
       // Update URL without refreshing the page
       window.history.pushState({}, '', `?${params.toString()}`);
@@ -494,7 +523,7 @@ function Home() {
                 <div className="flex space-x-2">
                   <div className="w-1/2">
                     <label className="block text-sm font-medium text-[#0C573C] mb-2">
-                      Bedrooms
+                      Min Bedrooms
                     </label>
                     <input
                       type="number"
@@ -506,13 +535,65 @@ function Home() {
                   </div>
                   <div className="w-1/2">
                     <label className="block text-sm font-medium text-[#0C573C] mb-2">
-                      Bathrooms
+                      Max Bedrooms
+                    </label>
+                    <input
+                      type="number"
+                      value={maxBedrooms}
+                      onChange={(e) => setMaxBedrooms(Number(e.target.value))}
+                      placeholder="Max"
+                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0C573C]"
+                    />
+                  </div>
+                </div>
+                <div className="flex space-x-2">
+                  <div className="w-1/2">
+                    <label className="block text-sm font-medium text-[#0C573C] mb-2">
+                      Min Bathrooms
                     </label>
                     <input
                       type="number"
                       value={minBathrooms}
                       onChange={(e) => setMinBathrooms(Number(e.target.value))}
                       placeholder="Min"
+                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0C573C]"
+                    />
+                  </div>
+                  <div className="w-1/2">
+                    <label className="block text-sm font-medium text-[#0C573C] mb-2">
+                      Max Bathrooms
+                    </label>
+                    <input
+                      type="number"
+                      value={maxBathrooms}
+                      onChange={(e) => setMaxBathrooms(Number(e.target.value))}
+                      placeholder="Max"
+                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0C573C]"
+                    />
+                  </div>
+                </div>
+                <div className="flex space-x-2">
+                  <div className="w-1/2">
+                    <label className="block text-sm font-medium text-[#0C573C] mb-2">
+                      Min m²
+                    </label>
+                    <input
+                      type="number"
+                      value={minSquareMeters}
+                      onChange={(e) => setMinSquareMeters(Number(e.target.value))}
+                      placeholder="Min"
+                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0C573C]"
+                    />
+                  </div>
+                  <div className="w-1/2">
+                    <label className="block text-sm font-medium text-[#0C573C] mb-2">
+                      Max m²
+                    </label>
+                    <input
+                      type="number"
+                      value={maxSquareMeters}
+                      onChange={(e) => setMaxSquareMeters(Number(e.target.value))}
+                      placeholder="Max"
                       className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0C573C]"
                     />
                   </div>
