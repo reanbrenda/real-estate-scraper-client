@@ -58,9 +58,9 @@ const Card = ({
           <h2 className="text-xl font-bold text-blue-800">{category}</h2>
           <p className="text-gray-600">{region}</p>
           <p className="text-lg font-semibold text-gray-800">${price}</p>
-          {squareMeter > 0 && (
+          
             <p className="text-gray-500">{squareMeter} sqm</p>
-          )}
+          
           <div className="flex justify-between mt-4 text-sm text-gray-700">
             <span>{bedrooms} Bedrooms</span>
             <span>{bathrooms} Bathrooms</span>
