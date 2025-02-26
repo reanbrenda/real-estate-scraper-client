@@ -5,7 +5,7 @@ import Card from "../components/Card";
 import Navigation from "../components/Navigation";
 import { useRouter, useSearchParams } from 'next/navigation';
 
-// Add this new component for location search
+
 const LocationSearchDropdown = ({ selectedLocations, setSelectedLocations }) => {
   const [regions, setRegions] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -15,7 +15,7 @@ const LocationSearchDropdown = ({ selectedLocations, setSelectedLocations }) => 
   const dropdownRef = useRef(null);
 
   useEffect(() => {
-    // Fetch available regions when component mounts
+    
     const fetchRegions = async () => {
       try {
         setLoading(true);
@@ -146,13 +146,120 @@ const LocationSearchDropdown = ({ selectedLocations, setSelectedLocations }) => 
   );
 };
 
+// New component for category selection with multiple select
+const CategoryMultiSelect = ({ selectedCategories, setSelectedCategories }) => {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const dropdownRef = useRef(null);
+  
+  const categories = [
+    "Plot of land",
+    "Chalet / Villa",
+    "Finca / Country house",
+    "Apartment",
+    "House",
+    "Estate / Manor house"
+  ];
+
+  useEffect(() => {
+    // Close dropdown when clicking outside
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const toggleSelection = (category) => {
+    if (selectedCategories.includes(category)) {
+      setSelectedCategories(selectedCategories.filter(cat => cat !== category));
+    } else {
+      setSelectedCategories([...selectedCategories, category]);
+    }
+  };
+
+  const filteredCategories = categories.filter(category => 
+    category.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <label className="block text-sm font-medium text-[#0C573C] mb-2">
+        Property Type
+      </label>
+      <div className="flex flex-wrap mb-2 gap-1">
+        {selectedCategories.map(category => (
+          <span 
+            key={category} 
+            className="inline-flex items-center px-2 py-1 rounded-md text-sm bg-[#E6FAF1] text-[#0C573C] border border-[#0C573C]"
+          >
+            {category}
+            <button 
+              onClick={() => toggleSelection(category)} 
+              className="ml-1 text-[#0C573C] hover:text-red-600"
+            >
+              ×
+            </button>
+          </span>
+        ))}
+      </div>
+      <div className="relative">
+        <input
+          type="text"
+          value={searchTerm}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            setIsDropdownOpen(true);
+          }}
+          onClick={() => setIsDropdownOpen(true)}
+          placeholder="e.g., Villa, Apartment"
+          className="w-full p-3 text-black border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0C573C]"
+        />
+      </div>
+      
+      {isDropdownOpen && (
+        <div className="absolute z-10 mt-1 w-full bg-white shadow-lg rounded-md max-h-60 overflow-y-auto border border-gray-300">
+          {filteredCategories.map(category => (
+            <div 
+              key={category}
+              onClick={() => toggleSelection(category)}
+              className={`p-2 hover:bg-gray-100 cursor-pointer flex items-center ${
+                selectedCategories.includes(category) ? 'bg-[#E6FAF1]' : ''
+              }`}
+            >
+              <input
+                type="checkbox"
+                checked={selectedCategories.includes(category)}
+                onChange={() => {}}
+                className="mr-2 accent-[#0C573C]"
+              />
+              {category}
+            </div>
+          ))}
+        </div>
+      )}
+      
+      {isDropdownOpen && searchTerm && filteredCategories.length === 0 && (
+        <div className="absolute z-10 mt-1 w-full bg-white shadow-lg rounded-md border border-gray-300 p-2 text-gray-500">
+          No matching property types
+        </div>
+      )}
+    </div>
+  );
+};
+
 const formatPrice = (price) => {
   return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 };
 
-// Modified to properly handle multiple regions
+// Modified to properly handle multiple regions and categories
 const fetchProperties = async (filters = {}) => {
-  const { description, regions, category, minPrice, maxPrice, minBedrooms, 
+  const { description, regions, categories, minPrice, maxPrice, minBedrooms, 
     maxBedrooms,
     minBathrooms, 
     maxBathrooms,
@@ -165,21 +272,27 @@ const fetchProperties = async (filters = {}) => {
     limit: "100",
   });
 
-  // Add description if exists
+  
   if (description) {
     params.append("description", description);
   }
 
-  // Add each region individually as a separate parameter
+ 
   if (regions && regions.length > 0) {
-    // The API expects multiple region parameters, not comma-separated
+   
     regions.forEach(region => {
       params.append("region", region);
     });
   }
 
-  // Add remaining parameters
-  if (category) params.append("category", category);
+
+  if (categories && categories.length > 0) {
+    categories.forEach(category => {
+      params.append("category", category);
+    });
+  }
+
+
   if (minPrice) params.append("min_price", minPrice);
   if (maxPrice) params.append("max_price", maxPrice);
   if (minBedrooms) params.append("min_bedrooms", minBedrooms);
@@ -217,24 +330,28 @@ function Home() {
   const [showSelectionMode, setShowSelectionMode] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
 
-  // Initialize states from URL parameters
+ 
   const [descriptionSearch, setDescriptionSearch] = useState(searchParams.get('description') || '');
-  // Parse multiple locations from URL
+  
   const [selectedLocations, setSelectedLocations] = useState(() => {
     const locationParam = searchParams.get('location');
     return locationParam ? locationParam.split(',') : [];
   });
+  
+
+  const [selectedCategories, setSelectedCategories] = useState(() => {
+    const categoryParam = searchParams.get('category');
+    return categoryParam ? categoryParam.split(',') : [];
+  });
+  
   const [minPrice, setMinPrice] = useState(searchParams.get('minPrice') || '');
   const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') || '');
-  const [category, setCategory] = useState(searchParams.get('category') || '');
   const [minBedrooms, setMinBedrooms] = useState(Number(searchParams.get('minBedrooms')) || 0);
   const [maxBedrooms, setMaxBedrooms] = useState(Number(searchParams.get('maxBedrooms')) || 0);
   const [minBathrooms, setMinBathrooms] = useState(Number(searchParams.get('minBathrooms')) || 0);
   const [maxBathrooms, setMaxBathrooms] = useState(Number(searchParams.get('maxBathrooms')) || 0);
   const [minSquareMeters, setMinSquareMeters] = useState(Number(searchParams.get('minSquareMeters')) || 0);
   const [maxSquareMeters, setMaxSquareMeters] = useState(Number(searchParams.get('maxSquareMeters')) || 0);
-
-  
 
   const togglePropertySelection = (propertyId) => {
     setSelectedProperties(prev => {
@@ -247,10 +364,10 @@ function Home() {
 
   const selectAllProperties = () => {
     if (selectedProperties.length === filteredProperties.length) {
-      // If all are selected, deselect all
+     
       setSelectedProperties([]);
     } else {
-      // Otherwise select all
+      
       setSelectedProperties(filteredProperties.map(property => property.id));
     }
   };
@@ -258,7 +375,7 @@ function Home() {
   useEffect(() => {
     const loadFiltersFromURL = async () => {
       if (!searchParams.toString()) {
-        // If no filters, load all properties
+        
         try {
           setLoading(true);
           const data = await fetchProperties();
@@ -279,10 +396,14 @@ function Home() {
         const locationParam = searchParams.get('location');
         const regions = locationParam ? locationParam.split(',') : [];
         
+        // Get all categories from URL
+        const categoryParam = searchParams.get('category');
+        const categories = categoryParam ? categoryParam.split(',') : [];
+        
         const filters = {
           description: searchParams.get('description'),
           regions: regions,
-          category: searchParams.get('category'),
+          categories: categories,
           minPrice: searchParams.get('minPrice'),
           maxPrice: searchParams.get('maxPrice'),
           bedrooms: searchParams.get('bedrooms'),
@@ -319,7 +440,7 @@ function Home() {
       const filters = {
         ...(descriptionSearch && { description: descriptionSearch }),
         ...(selectedLocations.length > 0 && { regions: selectedLocations }),
-        ...(category && { category }),
+        ...(selectedCategories.length > 0 && { categories: selectedCategories }),
         ...(minPrice && { minPrice }),
         ...(maxPrice && { maxPrice }),
         ...(minBedrooms > 0 && { minBedrooms }),
@@ -330,11 +451,11 @@ function Home() {
         ...(maxSquareMeters > 0 && { maxSquareMeters }),
       };
 
-      // Create URL parameters for navigation
+      
       const params = new URLSearchParams();
       if (descriptionSearch) params.append('description', descriptionSearch);
       if (selectedLocations.length > 0) params.append('location', selectedLocations.join(','));
-      if (category) params.append('category', category);
+      if (selectedCategories.length > 0) params.append('category', selectedCategories.join(','));
       if (minPrice) params.append('minPrice', minPrice);
       if (maxPrice) params.append('maxPrice', maxPrice);
       if (minBedrooms > 0) params.append('minBedrooms', minBedrooms.toString());
@@ -344,7 +465,7 @@ function Home() {
       if (minSquareMeters > 0) params.append('minSquareMeters', minSquareMeters.toString());
       if (maxSquareMeters > 0) params.append('maxSquareMeters', maxSquareMeters.toString());
       
-      // Update URL without refreshing the page
+     
       window.history.pushState({}, '', `?${params.toString()}`);
 
       const filteredData = await fetchProperties(filters);
@@ -443,6 +564,7 @@ function Home() {
       </>
     );
   }
+  
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -470,29 +592,18 @@ function Home() {
                   />
                 </div>
                 <div>
-                  {/* Replace the old location search with the new component */}
+               
                   <LocationSearchDropdown 
                     selectedLocations={selectedLocations} 
                     setSelectedLocations={setSelectedLocations} 
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-[#0C573C] mb-2">
-                    Property Type
-                  </label>
-                  <select
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0C573C] text-black"
-                  >
-                    <option value="" className="text-black">All Categories</option>
-                    <option value="Plot of land" className="text-black">Plot of land</option>
-                    <option value="Chalet / Villa" className="text-black">Chalet / Villa</option>
-                    <option value="Finca / Country house" className="text-black">Finca / Country House</option>
-                    <option value="Apartment" className="text-black">Apartment </option>
-                    <option value="House" className="text-black">House</option>
-                    <option value="Estate / Manor house" className="text-black"> Estate / Manor house</option>
-                  </select>
+                 
+                  <CategoryMultiSelect 
+                    selectedCategories={selectedCategories}
+                    setSelectedCategories={setSelectedCategories}
+                  />
                 </div>
                 <div className="flex space-x-2">
                   <div className="w-1/2">
@@ -639,7 +750,7 @@ function Home() {
                     {isDownloading 
                       ? "Downloading CSV..." 
                       : showSelectionMode 
-                        ? "Download Selected as CSV" 
+                        ? "Download Selected as CSV"
                         : "Select Properties for CSV"}
                   </button>
                 </div>

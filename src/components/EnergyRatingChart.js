@@ -1,7 +1,6 @@
 import React from "react";
 
 const EnergyRatingChart = ({ highlightedRating }) => {
-  if (!highlightedRating) return null;
   const ratings = [
     { label: "A", color: "bg-green-500", text: "más eficiente", width: "40%" },
     { label: "B", color: "bg-green-400", text: "", width: "50%" },

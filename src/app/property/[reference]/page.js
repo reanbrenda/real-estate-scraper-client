@@ -116,8 +116,7 @@ const PhotoModal = ({ photos, currentPhotoIndex, onClose, onNext, onPrevious }) 
               prev === property.photos.length - 1 ? 0 : prev + 1
           );
       };
-  
-      // Add keyboard navigation
+
       useEffect(() => {
           const handleKeyDown = (e) => {
               if (currentPhotoIndex === null) return;
@@ -184,31 +183,77 @@ const PhotoModal = ({ photos, currentPhotoIndex, onClose, onNext, onPrevious }) 
   
                   <div className="p-8">
                       <div className="flex justify-between items-center mb-6">
-                      <h1 className="text-4xl font-extrabold text-gray-900">
-    {property.category && property.category !== "None" ? property.category : ""}
-</h1>
+                          <div>
+                              <h1 className="text-4xl font-extrabold text-gray-900">
+                                  {property.title || (property.category && property.category !== "None" ? property.category : "")}
+                              </h1>
+                             
+                                  <p className="text-xl text-gray-700 mt-1">
+                                      {property.streetAddress}
+                                  </p>
+                             
+                          </div>
                           <div className="flex items-center text-gray-600">
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-[#0C573C]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                               </svg>
-                              <span className="text-lg">{property.region}</span>
+                              <div>
+                                  <span className="text-lg">{property.region}</span>
+                                  {property.town && <span className="text-lg ml-2">| {property.town}</span>}
+                              </div>
                           </div>
                       </div>
+
+                    
+                          <div className="bg-gray-50 p-4 rounded-lg mb-6">
+                              <h3 className="font-semibold text-gray-800 mb-2">Full Address(streetAddress,addressCity,addressState,addressCountry):</h3>
+                              <p className="text-gray-700">
+                                  {property.streetAddress && `${property.streetAddress}, `}
+                                  {property.addressCity && `${property.addressCity}, `}
+                                  {property.addressState && `${property.addressState}, `}
+                                  {property.addressCountry && property.addressCountry}
+                              </p>
+                          </div>
+                     
   
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                          {property.square_meters > 0 && (
+                              <div className="bg-gray-100 p-4 rounded-lg flex items-center">
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-3 text-[#0C573C]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                  </svg>
+                                  <div>
+                                      <p className="text-sm text-gray-600">Square Meters</p>
+                                      <p className="font-bold text-black">{property.square_meters} sqm</p>
+                                  </div>
+                              </div>
+                          )}
 
-                      {property.square_meters > 0 && (
-        <div className="bg-gray-100 p-4 rounded-lg flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-3 text-[#0C573C]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-            </svg>
-            <div>
-                <p className="text-sm text-gray-600">Square Meters</p>
-                <p className="font-bold text-black">{property.square_meters} sqm</p>
-            </div>
-        </div>
-    )}
+                          {property.land_area > 0 && (
+                              <div className="bg-gray-200 p-4 rounded-lg flex items-center">
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-3 text-[#0C573C]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                                  </svg>
+                                  <div>
+                                      <p className="text-sm text-gray-600">Land Area</p>
+                                      <p className="font-bold text-black">{property.land_area} sqm</p>
+                                  </div>
+                              </div>
+                          )}
+
+                          
+                              <div className="bg-gray-100 p-4 rounded-lg flex items-center">
+                                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-3 text-[#0C573C]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                  </svg>
+                                  <div>
+                                      <p className="text-sm text-gray-600">Built Up</p>
+                                      <p className="font-bold text-black">{property.built_up} sqm</p>
+                                  </div>
+                              </div>
+                          
+
                           <div className="bg-gray-200 p-4 rounded-lg flex items-center">
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-3 text-[#0C573C]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16H4a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
@@ -218,6 +263,7 @@ const PhotoModal = ({ photos, currentPhotoIndex, onClose, onNext, onPrevious }) 
                                   <p className="font-bold text-black">{property.bedrooms}</p>
                               </div>
                           </div>
+
                           <div className="bg-gray-100 p-4 rounded-lg flex items-center">
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-3 text-[#0C573C]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
@@ -227,6 +273,17 @@ const PhotoModal = ({ photos, currentPhotoIndex, onClose, onNext, onPrevious }) 
                                   <p className="font-bold text-black">{property.bathrooms}</p>
                               </div>
                           </div>
+
+                          <div className="bg-gray-200 p-4 rounded-lg flex items-center">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-3 text-[#0C573C]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              </svg>
+                              <div>
+                                  <p className="text-sm text-gray-600">Created At</p>
+                                  <p className="font-bold text-black">{property.propertyCreatedAt}</p>
+                              </div>
+                          </div>
+
                           <div className="bg-gray-100 p-4 rounded-lg flex items-center">
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-3 text-[#0C573C]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a2 2 0 012-2z" />
@@ -236,6 +293,32 @@ const PhotoModal = ({ photos, currentPhotoIndex, onClose, onNext, onPrevious }) 
                                   <p className="font-bold text-black">{property.reference}</p>
                               </div>
                           </div>
+                      </div>
+
+                      
+                      <div className="flex flex-wrap gap-4 mb-8">
+                          {property.platform && (
+                              <div className="bg-gray-50 px-4 py-2 rounded-lg">
+                                  <span className="font-medium text-gray-800">Platform: </span>
+                                  <span className="text-gray-700">{property.platform}</span>
+                              </div>
+                          )}
+                          
+                          
+                              <div className="bg-gray-50 px-4 py-2 rounded-lg">
+                                  <span className="font-medium text-gray-800">companyName: </span>
+                                  <span className="text-gray-700">{property.companyName}</span>
+                              </div>
+                          
+                          
+                         
+                              <div className="bg-gray-50 px-4 py-2 rounded-lg">
+                                  <span className="font-medium text-gray-800">Status: </span>
+                                  <span className={`${property.onOff ? 'text-green-600' : 'text-red-600'} font-medium`}>
+                                      {property.onOff}
+                                  </span>
+                              </div>
+                          
                       </div>
   
                       <div>
@@ -256,8 +339,20 @@ const PhotoModal = ({ photos, currentPhotoIndex, onClose, onNext, onPrevious }) 
                               {property.description}
                           </p>
                       </div>
+
+                      
+                      {property.features && (
+                          <div className="mb-8">
+                              <h2 className="text-2xl font-bold text-gray-900 mb-4">Features</h2>
+                              <div className="bg-gray-50 p-4 rounded-lg">
+                                  <p className="text-gray-700 leading-relaxed">
+                                      {property.features}
+                                  </p>
+                              </div>
+                          </div>
+                      )}
   
-                      {property.photos.length > 1 && (
+                      {property.photos && property.photos.length > 1 && (
                           <div>
                               <h2 className="text-2xl font-bold text-gray-900 mb-4">Additional Photos</h2>
                               <div className="grid grid-cols-3 gap-4">
@@ -274,13 +369,12 @@ const PhotoModal = ({ photos, currentPhotoIndex, onClose, onNext, onPrevious }) 
                           </div>
                       )}
                   </div>
-                  {property.energy_rating && (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-        <EnergyRatingChart highlightedRating={property.energy_rating} />
-    </div>
-)}
+                  
+                  <div className="bg-gray-50 p-8 border-t border-gray-200">
+                      <h2 className="text-2xl font-bold text-gray-900 mb-6">Energy Rating</h2>
+                      <EnergyRatingChart highlightedRating={property.energy_rating} />
+                  </div>
               </div>
           </div>
       );
   }
-  

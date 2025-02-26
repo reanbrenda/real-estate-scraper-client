@@ -12,6 +12,7 @@ export async function fetchProperties({
   bedrooms,
   bathrooms,
   energy_rating,
+  platform,
 } = {}) {
   try {
     const params = new URLSearchParams({
@@ -27,6 +28,7 @@ export async function fetchProperties({
       ...(bedrooms && { bedrooms: bedrooms.toString() }),
       ...(bathrooms && { bathrooms: bathrooms.toString() }),
       ...(energy_rating && { energy_rating }),
+      ...(platform && { platform }),
     });
 
     const url = `https://real-estate-scraper-api.onrender.com/properties?${params}`;
